@@ -406,10 +406,11 @@ marcha:{name:'Marcha con rodillas altas',g:'cardio',m:'Calentamiento · cardio s
   b:{hip:[100,71],t:-90,hNp:[30,34],hFp:[130,38],fN:[102,135],fF:[108,100],toeN:0,toeF:25},
   steps:['De pie, espalda recta.','Sube una rodilla a la altura de la cadera y mueve el brazo contrario.','Alterna sin saltar, a buen ritmo.'],
   tip:'Sin impacto: cuida las rodillas mientras bajas de peso.',bad:'Inclinarte hacia atrás al subir la rodilla.'},
-boxeo:{name:'Boxeo de sombra',g:'cardio',m:'Hombros · cardio',hl:['shoulders'],timed:1,seq:1,period:1.2,
-  a:{hip:[100,76],t:-80,hNp:[-6,47],hFp:[-25,20],fN:[84,135],fF:[116,135]},b:{hip:[100,76],t:-87,hNp:[-25,20],hFp:[-6,47],fN:[84,135],fF:[116,135]},
-  steps:['Un pie delante del otro, rodillas sueltas, puños junto a la cara.','Lanza golpes rectos alternando brazos.','Gira un poco la cadera con cada golpe.'],
-  tip:'Sube pulsaciones sin saltar ni molestar a los vecinos.',bad:'Bajar la guardia: el puño vuelve siempre a la cara.'}
+trote:{name:'Trote con talones atrás',g:'cardio',m:'Cardio · isquios · gemelos',hl:['thighs','calves'],timed:1,seq:1,period:1.1,
+  a:{hip:[100,71],t:-86,hNp:[112,36],hFp:[58,36],fN:[74,98],fF:[100,135],toeN:120,toeF:0},
+  b:{hip:[100,71],t:-86,hNp:[58,36],hFp:[112,36],fN:[100,135],fF:[74,98],toeN:0,toeF:120},
+  steps:['De pie, codos doblados como al correr.','Lleva un talón hacia el glúteo y cambia de pierna, moviendo los brazos.','Mantén un ritmo que te deje hablar con frases cortas.'],
+  tip:'Sube pulsaciones sin moverte del sitio ni molestar a los vecinos.',bad:'Echar el cuerpo hacia delante: el pecho va alto.'}
 };
 const GROUPS=[['todos','Todos'],['pecho','Pecho'],['espalda','Espalda'],['hombros','Hombros'],['brazos','Brazos'],['piernas','Piernas'],['core','Core'],['cardio','Cardio']];
 
@@ -417,27 +418,27 @@ const GROUPS=[['todos','Todos'],['pecho','Pecho'],['espalda','Espalda'],['hombro
 const RT={
 A:{name:'Pecho y brazos',focus:'Empuje',desc:'Pecho firme, hombros y tríceps.',lv:{
  1:[['marcha',1,40],['flex_pared',3,10],['flex_incl',2,6],['press',3,10],['press_suelo',2,10,4],['curl',2,10,2],['plancha',3,20,3]],
- 2:[['boxeo',1,45],['flex_incl',3,10],['flex_rod',3,8],['press_suelo',3,12,2],['press',3,12],['fondos',2,8,3],['patada',2,10,4],['plancha',3,30]],
- 3:[['boxeo',1,60],['flex',3,8],['flex_decl',2,6],['press_suelo',3,14,2],['pike',3,8,3],['fondos',3,10],['flex_diam',2,6,4],['plancha',3,45]]}},
+ 2:[['trote',1,45],['flex_incl',3,10],['flex_rod',3,8],['press_suelo',3,12,2],['press',3,12],['fondos',2,8,3],['patada',2,10,4],['plancha',3,30]],
+ 3:[['trote',1,60],['flex',3,8],['flex_decl',2,6],['press_suelo',3,14,2],['pike',3,8,3],['fondos',3,10],['flex_diam',2,6,4],['plancha',3,45]]}},
 B:{name:'Piernas y core',focus:'Tren inferior',desc:'El día que más calorías gasta.',lv:{
  1:[['marcha',1,40],['sentadilla',3,10],['puente',3,12],['talones',2,15,2],['crunch',3,10],['birddog',2,6,3],['deadbug',2,6,4]],
  2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30,2],['elev_piernas',2,10,3],['deadbug',2,8,4],['escalador',3,20]],
  3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['peso_muerto',2,12,4],['wallsit',3,45,2],['puente',2,15],['elev_piernas',2,12,3],['escalador',3,30]]}},
 C:{name:'Espalda y postura',focus:'Tirón',desc:'Abre los hombros y endereza la espalda.',lv:{
  1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6,2],['plancha',2,20,3],['angel',2,10,4]],
- 2:[['boxeo',1,45],['remo',4,12],['peso_muerto',3,10,4],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['angel',2,12,3],['plancha',3,30]],
- 3:[['boxeo',1,60],['remo',4,15],['peso_muerto',3,12],['flex',3,8],['curl',4,12,2],['pike',2,8,3],['elev_front',2,10,4],['plancha',3,45]]}},
+ 2:[['trote',1,45],['remo',4,12],['peso_muerto',3,10,4],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['angel',2,12,3],['plancha',3,30]],
+ 3:[['trote',1,60],['remo',4,15],['peso_muerto',3,12],['flex',3,8],['curl',4,12,2],['pike',2,8,3],['elev_front',2,10,4],['plancha',3,45]]}},
 D:{name:'Cuerpo completo',focus:'Quema',desc:'Todo el cuerpo a buen ritmo.',lv:{
- 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['boxeo',3,30,3],['crunch',2,10,2],['elev_front',2,10,4]],
- 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['boxeo',3,40,3],['elev_piernas',2,10,2],['elev_front',2,12,4]],
- 3:[['boxeo',1,60],['zancada',3,12],['flex',3,8],['escalador',3,30],['remo',3,15,3],['flex_decl',2,6],['deadbug',2,8,4],['plancha',3,45,2]]}}
+ 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['trote',3,30,3],['crunch',2,10,2],['elev_front',2,10,4]],
+ 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['trote',3,40,3],['elev_piernas',2,10,2],['elev_front',2,12,4]],
+ 3:[['trote',1,60],['zancada',3,12],['flex',3,8],['escalador',3,30],['remo',3,15,3],['flex_decl',2,6],['deadbug',2,8,4],['plancha',3,45,2]]}}
 };
 const CYCLE=['A','B','C','D'];
 {const x=[['sentadilla',1,10],['flex_pared',1,10],['talones',1,15]];RT.P={name:'Pausa activa',focus:'Trabajo',desc:'',lv:{1:x,2:x,3:x}}}
 RT.K={name:'Cardio en casa',focus:'Cardio',desc:'',lv:{
- 1:[['marcha',1,60],['jacks',4,30],['boxeo',4,40]],
- 2:[['marcha',1,60],['jacks',5,40],['boxeo',4,45],['escalador',3,20]],
- 3:[['marcha',1,60],['jacks',5,45],['boxeo',5,45],['escalador',4,30]]}};
+ 1:[['marcha',1,60],['jacks',4,30],['trote',4,40]],
+ 2:[['marcha',1,60],['jacks',5,40],['trote',4,45],['escalador',3,20]],
+ 3:[['marcha',1,60],['jacks',5,45],['trote',5,45],['escalador',4,30]]}};
 const PRESET={3:[1,0,1,0,0,1,0],4:[1,0,1,0,1,1,0],5:[1,1,0,1,1,1,0]};
 const REC={3:'lunes, miércoles y sábado',4:'lunes, miércoles, viernes y sábado',5:'lunes, martes, jueves, viernes y sábado'};
 const DAYN=['el lunes','el martes','el miércoles','el jueves','el viernes','el sábado','el domingo'];
@@ -490,6 +491,7 @@ function schedule(){const w=weekInfo(),ti=todayIdx(),by={};S.sessions.forEach(s=
   return w.days.map((d,i)=>d.done?[i,(RT[by[d.k]]||RT.A).name,'Hecho']:(!d.plan||i<ti)?null:[i,RT[CYCLE[(S.cycle+j++)%CYCLE.length]].name,i===ti?'Hoy':'']).filter(Boolean)}
 function note(id){const w=S.pw;
   if(id==='jacks'&&w<=4)return 'Estas semanas, sin salto: abre una pierna al lado y luego la otra mientras subes los brazos.';
+  if(id==='trote'&&w<=4)return 'Estas semanas, sin saltar: marcha rápida llevando el talón atrás.';
   if(id==='fondos')return 'Rodillas dobladas y pies cerca. Baja poco: codo a 90° como máximo. Si molesta delante del hombro, sáltalo y en «Ver técnica» toca «Me molesta este ejercicio».';
   if(id==='flex_incl'&&w<=2)return 'Estas dos semanas, manos en una mesa o encimera. Pasa a la silla cuando salgan todas las series.';
   if(id==='sentadilla'&&w<=2)return 'Estas dos semanas, siéntate y levántate de una silla.';
@@ -626,7 +628,7 @@ function vHoy(){
   if(st==='rest'&&ti!==6&&!cardioToday())st='cardio';
   const ck=st==='cardio',k=ck?'K':k0,r=RT[k],items=routine(k),sets=items.reduce((t,i)=>t+i[1],0),est=estMin(items,ck?30:undefined),nxt=RT[k0].name.toLowerCase(),kEst=estMin(routine('K'),30);
   const H={go:`Hoy toca<br>${r.name.toLowerCase()}`,done:'Hecho<br>por hoy',rest:'Hoy<br>descansas',cardio:'Hoy toca<br>cardio en casa',catch:'Recupera<br>tu sesión'}[st];
-  const sub={go:`Tu hora: ${WHEN[S.when][1]}. Son ${est} minutos.`,done:`Buen trabajo. Vuelves ${nextDay()}: ${nxt}.`,cardio:`Hoy no hay fuerza. En lugar de la caminata, ${est} minutos de cardio en casa: polichinelas, boxeo y marcha. Fuerza ${nextDay()}: ${nxt}.`,
+  const sub={go:`Tu hora: ${WHEN[S.when][1]}. Son ${est} minutos.`,done:`Buen trabajo. Vuelves ${nextDay()}: ${nxt}.`,cardio:`Hoy no hay fuerza. En lugar de la caminata, ${est} minutos de cardio en casa: polichinelas, trote y marcha. Fuerza ${nextDay()}: ${nxt}.`,
     rest:ti===6?`Domingo de descanso total: el músculo crece hoy. Vuelves ${nextDay()}.`:`Cardio hecho. El descanso también construye. Vuelves ${nextDay()}.`,catch:`Te quedó una sesión pendiente esta semana. Son ${est} minutos.`}[st];
   const cta={go:'Empezar entreno',catch:'Empezar entreno',cardio:'Empezar cardio',rest:'Adelantar la próxima sesión',done:'Entrenar otra vez'}[st],pri=st==='go'||st==='catch'||ck;
   const coach=S.note?`<div class="card banner"><p><b>Tu entrenador:</b> ${S.note}</p><button class="btn sm" data-act="noteOk">Vale</button></div>`:'';
@@ -652,7 +654,7 @@ function vHoy(){
       <div class="goal"><b class="num">${w.count}/${goalN()}</b>sesiones</div></div>
       <div style="margin-top:14px">${sch.map(([i,n,t])=>`<div class="hist"><span><b>${DAY3[i]}</b> <span class="mut">· ${n}</span></span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
       <p class="small mut" style="margin-top:12px">Lo que toca cada día lo decido yo. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}. Los demás días, ${kEst} minutos de cardio en casa en lugar de la caminata.</p></div></div>
-    ${ck?'':`<div class="sec"><h3>Si hoy no caminas</h3><button class="row" data-act="cardio">${stage('jacks',false,'thumb')}<div class="t"><b>Cardio en casa · ${kEst} min</b><span>Polichinelas, boxeo y marcha. Cuenta como tu caminata del día.</span></div><div class="q num">${cardioToday()?'✓':'—'}<small>hoy</small></div></button></div>`}
+    ${ck?'':`<div class="sec"><h3>Si hoy no caminas</h3><button class="row" data-act="cardio">${stage('jacks',false,'thumb')}<div class="t"><b>Cardio en casa · ${kEst} min</b><span>Polichinelas, trote y marcha. Cuenta como tu caminata del día.</span></div><div class="q num">${cardioToday()?'✓':'—'}<small>hoy</small></div></button></div>`}
     <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Muchas horas sentado apagan el cuerpo. Levántate y hazla 2 o 3 veces en tu jornada.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
   </div><div>
     <div class="sec"><h3>Ejercicios de la sesión</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
