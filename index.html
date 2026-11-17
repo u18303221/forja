@@ -478,7 +478,71 @@ const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:nul
 const fresh=()=>JSON.parse(JSON.stringify(DEF));
 let S=load();
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}')||{},t={...fresh(),...o};if(o.setup&&o.pw==null&&o.level)t.pw={1:1,2:5,3:9}[o.level]||1;delete t.level;delete t.rest;return t}catch(e){return fresh()}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function store(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.ts=Date.now();store();queuePush()}
+
+/* ================= CUENTA Y SINCRONIZACIÓN (Supabase) ================= */
+const SB={url:'https://nhldxpngnrsffovdjlkq.supabase.co',key:'sb_publishable_oX86b1gvIsl1Ik77t4v15w_O3XqNYbx'},AKEY='forja.auth';
+let HANDOFF=null;const readAuth=()=>{try{return JSON.parse(localStorage.getItem(AKEY)||'null')}catch(e){return null}};
+let AU=readAuth(),syncMsg='',pushT=0,refreshing=null,syncing=false;
+const setAuth=a=>{AU=a;try{a?localStorage.setItem(AKEY,JSON.stringify(a)):localStorage.removeItem(AKEY)}catch(e){}};
+const appUrl=()=>location.origin+location.pathname;
+const MK='forja.oauth',escH=t=>String(t||'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+async function login(){
+  try{const r=await fetch(SB.url+'/auth/v1/settings',{headers:{apikey:SB.key}}),j=await r.json();
+    if(!(j.external&&j.external.google)){syncMsg='El inicio con Google todavía no está activado en el servidor.';return false}}catch(e){syncMsg='Necesitas internet para entrar con Google.';return false}
+  try{localStorage.setItem(MK,String(Date.now()))}catch(e){}
+  location.href=SB.url+'/auth/v1/authorize?provider=google&prompt=select_account&redirect_to='+encodeURIComponent(appUrl());return true}
+async function useSession(at,rt,exp){setAuth({at,rt,exp});
+  try{const u=await api('/auth/v1/user');setAuth({...AU,uid:u.id,email:u.email});return true}catch(e){setAuth(null);return false}}
+async function pasteCode(code){code=(code||'').trim();if(!code)return;
+  try{const r=await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:code})});
+    if(!r.ok)throw 0;const j=await r.json();
+    if(!await useSession(j.access_token,j.refresh_token,Date.now()+j.expires_in*1000))throw 0;syncMsg='';await sync()}
+  catch(e){syncMsg='Ese código no sirve o ya se usó. Vuelve a entrar con Google para obtener otro.'}
+  S.setup?render():renderOb()}
+function handoff(rt){$('#onboard').innerHTML=`<div class="ob"><div class="logo">FORJA</div><h1>Un paso más</h1>
+  <p class="mut">Google confirmó tu cuenta, pero esta ventana es Safari y no la app instalada. Copia el código y pégalo en la app.</p>
+  <div class="sec"><ol class="steps"><li><span>Toca <b>Copiar código</b>.</span></li><li><span>Cierra esta ventana y abre <b>Forja</b> desde su icono.</span></li><li><span>En la pantalla de inicio o en <b>Perfil → Tu cuenta</b>, toca <b>Tengo un código</b> y pégalo.</span></li></ol></div>
+  <div class="sec"><button class="btn pri xl" id="cpBtn" style="width:100%">Copiar código</button><textarea id="cpTxt" readonly style="width:100%;margin-top:12px;height:70px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--mut);font-size:16px;padding:12px">${escH(rt)}</textarea>
+  <p class="small mut" style="margin-top:10px">El código sirve una sola vez y caduca si no lo usas. No lo compartas.</p></div></div>`;
+  $('#onboard').classList.add('on');
+  $('#cpBtn').onclick=async()=>{try{await navigator.clipboard.writeText(rt)}catch(e){const t=$('#cpTxt');t.focus();t.select();try{document.execCommand('copy')}catch(_){}}$('#cpBtn').textContent='Copiado. Ahora abre la app Forja'}}
+async function token(){if(!AU)return null;
+  if(AU.exp-Date.now()>60000)return AU.at;
+  refreshing=refreshing||(async()=>{try{const r=await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:AU.rt})});
+      if(r.ok){const j=await r.json();setAuth({...AU,at:j.access_token,rt:j.refresh_token,exp:Date.now()+j.expires_in*1000})}
+      else if(r.status===400||r.status===401){setAuth(null);syncMsg='La sesión caducó. Vuelve a entrar con Google; tus datos siguen en este dispositivo.'}}catch(e){}refreshing=null})();
+  await refreshing;return AU&&AU.exp-Date.now()>0?AU.at:null}
+async function api(path,opt={}){const t=await token();if(!t)throw new Error('sin sesión');
+  const r=await fetch(SB.url+path,{...opt,headers:{apikey:SB.key,Authorization:'Bearer '+t,'Content-Type':'application/json',...(opt.headers||{})}});
+  if(!r.ok)throw new Error('http '+r.status);return r.status===204?null:r.json().catch(()=>null)}
+async function push(){if(!AU||!navigator.onLine)return;
+  await api('/rest/v1/forja_state?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:AU.uid,data:S,ts:S.ts||0,updated_at:new Date().toISOString()})});
+  AU.synced=Date.now();setAuth(AU);syncMsg=''}
+function queuePush(){if(!AU)return;clearTimeout(pushT);pushT=setTimeout(()=>push().catch(()=>{syncMsg='Sin conexión: se subirá cuando vuelva internet.'}),1500)}
+async function sync(){if(!AU||syncing||!navigator.onLine)return;syncing=true;
+  try{const rows=await api('/rest/v1/forja_state?select=data,ts'),r=rows&&rows[0];
+    const mine=S.sessions.length+S.weights.length,theirs=r?((r.data.sessions||[]).length+(r.data.weights||[]).length):0;
+    if(r&&r.data&&r.data.setup&&(r.ts>(S.ts||0)||(mine===0&&theirs>0))){
+      if(!P){S={...fresh(),...r.data};store();AU.synced=Date.now();setAuth(AU);syncMsg='';$('#onboard').classList.remove('on');render()}}
+    else if(S.setup&&(!r||(S.ts||0)>r.ts))await push();
+    else{AU.synced=Date.now();setAuth(AU);syncMsg=''}}
+  catch(e){syncMsg=AU?'No pude sincronizar ahora. Lo reintento al volver a abrir.':syncMsg}
+  syncing=false;if(tab==='perfil'&&!P)render()}
+async function authReturn(){const h=location.hash.slice(1);if(!/access_token=|error=/.test(h))return;
+  const q=new URLSearchParams(h);history.replaceState(null,'',appUrl());
+  if(q.get('error')){syncMsg='Google no completó el inicio de sesión. Inténtalo de nuevo.';return}
+  let mk=null;try{mk=localStorage.getItem(MK);localStorage.removeItem(MK)}catch(e){}
+  if(!mk){HANDOFF=q.get('refresh_token');return}
+  if(!await useSession(q.get('access_token'),q.get('refresh_token'),Date.now()+(+q.get('expires_in')||3600)*1000)){syncMsg='No pude confirmar tu cuenta. Inténtalo de nuevo.';return}
+  tab=S.setup?'perfil':tab}
+async function logout(){const t=AU&&AU.at;setAuth(null);syncMsg='';if(t)fetch(SB.url+'/auth/v1/logout?scope=local',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+t}}).catch(()=>{})}
+const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'ahora mismo':m<60?`hace ${m} min`:m<1440?`hace ${Math.round(m/60)} h`:`hace ${Math.round(m/1440)} días`};
+const GBTN=`<svg viewBox="0 0 24 24" style="width:20px;height:20px"><path fill="#4285F4" d="M22.5 12.2c0-.8-.1-1.500-.2-2.200H12v4.200h5.900a5 5 0 0 1-2.200 3.300v2.700h3.600c2.100-1.900 3.200-4.800 3.200-8z"/><path fill="#34A853" d="M12 23c3 0 5.500-1 7.300-2.700l-3.600-2.700c-1 .7-2.300 1.100-3.700 1.100-2.900 0-5.300-1.900-6.200-4.500H2.100v2.800A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.800 14.200a6.600 6.600 0 0 1 0-4.300V7.100H2.100a11 11 0 0 0 0 9.900l3.700-2.800z"/><path fill="#EA4335" d="M12 5.400c1.600 0 3.100.6 4.200 1.600l3.200-3.100A11 11 0 0 0 2.100 7.100l3.700 2.800c.9-2.600 3.300-4.500 6.200-4.500z"/></svg>`;
+const accountCard=()=>`<div class="sec"><h3>Tu cuenta</h3><div class="card note">${AU&&AU.uid?
+  `<p><b>Conectado:</b> ${escH(AU.email)||'tu cuenta de Google'}</p><p class="small mut" style="margin-top:6px">${syncMsg||(AU.synced?'Datos guardados en la nube '+ago(AU.synced)+'.':'Sincronizando…')} Entra con la misma cuenta en otro dispositivo y aparecerán allí.</p><div class="field" style="margin-top:14px"><button class="btn sm" data-act="syncNow" style="flex:1">Sincronizar ahora</button><button class="btn sm ghost" data-act="logout" style="flex:1;color:var(--mut)">Cerrar sesión</button></div>`:
+  `<p>Entra con Google para guardar tus sesiones, tu semana del plan y tu peso en la nube, y verlos también en tu tablet.</p>${syncMsg?`<p class="small" style="margin-top:8px;color:var(--ac2)">${syncMsg}</p>`:''}<button class="btn" data-act="login" style="width:100%;margin-top:14px;background:#fff;color:#1f1f1f;border-color:#fff">${GBTN}Entrar con Google</button><details style="margin-top:12px"><summary class="small mut">Tengo un código</summary><div class="field" style="margin-top:12px"><input id="codeIn" placeholder="Pega aquí tu código" aria-label="Código de acceso" autocomplete="off" autocapitalize="off" style="font-size:16px;font-weight:500"><button class="btn sm" data-act="code" style="min-height:52px">Usar</button></div></details>`}</div></div>`;
 const pad=n=>String(n).padStart(2,'0');
 const dkey=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const monday=(d=new Date())=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
@@ -577,6 +641,7 @@ function vPerfil(){
     <div class="set"><label>Horario</label>${seg('when',[['am','Mañana'],['pm','Noche']])}<p>${S.when==='am'?'Recomendado si trabajas de 8:30 hasta la noche: la mañana es el único rato que el trabajo no te quita. Levántate a las 6:45, entrena y a la ducha.':'Funciona si entrenas nada más llegar, antes de cenar o sentarte. Si llegas agotado y lo saltas, pásate a la mañana.'}</p></div>
     <div class="set" style="margin:0"><label>Sonido</label>${seg('sound',[[true,'Activado'],[false,'Silencio']])}<p>Pitidos al acabar cada serie y cada descanso. El descanso lo marca el plan: ahora ${cfg(S.pw).rest} segundos.</p></div>
   </div>
+  ${accountCard()}
   <div class="sec"><h3>Instalar en tu iPhone</h3><div class="card note"><p>Abre esta página en <b>Safari</b>, toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba; a veces está dentro de <b>···</b>) y elige <b>«Agregar a Inicio»</b> o «Añadir a pantalla de inicio». Queda con su icono, a pantalla completa y funciona sin internet. Instálala primero y configúrala después: los datos se guardan solo en la app instalada. Con el iPhone en silencio, los pitidos no suenan.</p></div></div>
   </div><div>
   <div class="sec"><h3>Lo que de verdad cambia el cuerpo</h3><div class="card note"><ul style="margin:0">
@@ -612,7 +677,8 @@ function renderOb(){$('#onboard').innerHTML=`<div class="ob"><div class="logo">F
   <div class="sec"><h3>¿Cuántos días por semana?</h3><div class="seg">${[3,4,5].map(d=>`<button class="${OB.days===d?'on':''}" data-act="ob" data-k="days" data-v="${d}">${d} días</button>`).join('')}</div><p class="small mut" style="margin-top:10px">Te propongo ${REC[OB.days]}. Con jornadas largas, 3 días es lo que se sostiene.</p></div>
   <div class="sec"><h3>¿A qué hora?</h3><div class="opt">${[['am','Por la mañana · recomendado','Si trabajas de 8:30 hasta la noche: a las 6:45, antes de salir'],['pm','Por la noche','Al llegar a casa, antes de cenar']].map(([v,t,d])=>`<button class="${OB.when===v?'on':''}" data-act="ob" data-k="when" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>
   <div class="sec"><h3>Tu peso actual (opcional)</h3><div class="field"><input id="obKg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="kg" aria-label="Peso actual en kilos"></div></div>
-  <div class="sec"><button class="btn pri xl" data-act="obGo" style="width:100%">Crear mi plan</button></div></div>`}
+  <div class="sec"><button class="btn pri xl" data-act="obGo" style="width:100%">Crear mi plan</button>
+    <button class="btn" data-act="login" style="width:100%;margin-top:12px;background:#fff;color:#1f1f1f;border-color:#fff">${GBTN}Ya tengo mis datos: entrar con Google</button><details style="margin-top:12px"><summary class="small mut">Tengo un código</summary><div class="field" style="margin-top:12px"><input id="codeIn" placeholder="Pega aquí tu código" aria-label="Código de acceso" autocomplete="off" autocapitalize="off" style="font-size:16px;font-weight:500"><button class="btn sm" data-act="code" style="min-height:52px">Usar</button></div></details>${syncMsg?`<p class="small" style="margin-top:8px;color:var(--ac2)">${syncMsg}</p>`:''}</div></div>`}
 
 /* ---------- confirmación ---------- */
 let modalYes=null;
@@ -713,7 +779,11 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
     case 'pause':if(P.paused){P.end=Date.now()+P.left;P.paused=false;b.textContent='Pausa'}else{P.left=P.end-Date.now();P.paused=true;b.textContent='Continuar'}break;
     case 'quit':ask('¿Salir del entreno?','Esta sesión no se guardará.','Salir',()=>{P.phase='done';history.back()});break;
     case 'closePlayer':history.back();break;
-    case 'reset':ask('¿Borrar todo?','Se eliminan sesiones, pesos y ajustes de este dispositivo.','Borrar',()=>{try{localStorage.removeItem(KEY)}catch(e){}S=fresh();tab='hoy';filt='todos';boot()});break;
+    case 'reset':ask('¿Borrar todo?',AU?'Se eliminan sesiones, pesos y ajustes de este dispositivo y de tu cuenta en la nube.':'Se eliminan sesiones, pesos y ajustes de este dispositivo.','Borrar',async()=>{clearTimeout(pushT);if(AU){try{await api('/rest/v1/forja_state?user_id=eq.'+AU.uid,{method:'DELETE'})}catch(e){syncMsg='No pude borrar la copia de la nube (sin conexión). Vuelve a intentarlo con internet.';render();return}}try{localStorage.removeItem(KEY)}catch(e){}S=fresh();tab='hoy';filt='todos';boot()});break;
+    case 'login':b.disabled=true;login().then(ok=>{if(!ok){S.setup?render():renderOb()}});break;
+    case 'code':pasteCode($('#codeIn').value);break;
+    case 'logout':ask('¿Cerrar sesión?','Tus datos se quedan en este dispositivo, pero dejan de guardarse en la nube.','Cerrar sesión',()=>{logout();render()});break;
+    case 'syncNow':syncMsg='';sync().then(()=>render());break;
     case 'mNo':$('#modal').classList.remove('on');break;
     case 'mYes':$('#modal').classList.remove('on');modalYes&&modalYes();break;
   }});
@@ -724,7 +794,8 @@ addEventListener('popstate',()=>{if($('#modal').classList.contains('on'))$('#mod
   if($('#sheet').classList.contains('on')){$('#sheet').classList.remove('on');$('#sheet').innerHTML='';mountAnims();return}
   if(P){if(P.phase==='done')closePlayer();else{history.pushState({ov:1},'');ask('¿Salir del entreno?','Esta sesión no se guardará.','Salir',()=>{P.phase='done';history.back()})}}});
 setInterval(()=>{const c=$('#clock');if(c)c.textContent=nowTxt()},15000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!P&&S.setup&&!$('#sheet').classList.contains('on')){checkGap();render()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!P&&S.setup&&!$('#sheet').classList.contains('on')){checkGap();render()}if(document.visibilityState==='visible'){if(!AU){AU=readAuth();if(AU&&!P&&tab==='perfil')render()}sync()}});
+addEventListener('online',()=>{if(AU)sync()});
 /* sin zoom: ni pellizco ni doble toque (iOS ignora user-scalable) */
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
@@ -735,7 +806,8 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
   if(still&&n-lt<400&&e.touches.length===0&&!e.target.closest('input')){e.preventDefault();const b=e.target.closest('[data-act]');if(b)b.click()}
   lt=n},{passive:false});}
 function boot(){const ls=S.sessions[S.sessions.length-1];if(S.setup&&ls&&ls.rate===null)applyRate('B',true);if(S.setup)checkGap();if(!S.setup){OB={level:1,days:3,when:'am'};renderOb();$('#onboard').classList.add('on')}render()}
-boot();
+authReturn().then(()=>{if(HANDOFF)return handoff(HANDOFF);boot();sync()});
+addEventListener('hashchange',()=>{if(/access_token=|error=/.test(location.hash))location.reload()});
 if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
