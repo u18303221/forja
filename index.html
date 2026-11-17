@@ -417,7 +417,8 @@ const lv=()=>cfg(S.pw).lv;
 const FOCUS=[null,'despertar el cuerpo','sumar series','todas las series','rutina completa','movimientos nuevos, semana suave','sumar series','todas las series','base completa y test de flexiones','flexión clásica, semana suave','sumar series','todas las series','semana cumbre'];
 const focus=()=>(S.hold&&S.pw>=9)?'un poco más que la semana pasada':FOCUS[S.pw];
 const phase=()=>S.pw<=4?['Arranque','Aprender los movimientos y crear el hábito.']:S.pw<=8?['Base','Ejercicios nuevos y más trabajo.']:S.hold?['Base+','Un poco más cada semana hasta que salga la flexión clásica.']:['Forja','Flexión clásica y cuerpo completo.'];
-const need=()=>(S.pw>=9&&!S.hold&&goalN()>=4)?4:3;
+const tDays=()=>S.pw>=5?4:3;
+const need=()=>tDays();
 const isWarm=(it,i)=>i===0&&it[1]===1;
 const capOf=id=>['fondos','flex_decl','pike'].includes(id)?10:['flex_pared','flex_incl','flex_rod','flex'].includes(id)?15:['superman','elev_piernas'].includes(id)?12:EX[id].side?12:EX[id].timed?60:['sentadilla','puente','talones'].includes(id)?20:16;
 function modifier(week,items,i,bonus=0,ease=false){
@@ -466,11 +467,11 @@ function closeWeek(o,pass){
     S.pw=Math.max(1,from-1);S.rep=0;S.bonus=0;if(S.pw<9)S.hold=false}
   else if(o==='repeat'){S.rep++;S.bonus=0;m='Esta semana se repite. No es un castigo: el cuerpo pide una vuelta más antes de subir.'}
   else{let next=from+1,easy=F===n;const b0=S.bonus;if(easy)S.bonus=Math.min(2,S.bonus+1);
-    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Si quieres un cuarto día, actívalo en Perfil.'}
+    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave.'}
       else m='Seguimos en Base con un poco más cada semana. No es ir atrás: es llegar fuerte a la flexión clásica. Te lo vuelvo a preguntar la semana que viene.'}
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
     S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
-    if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
+    if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento. Y pasamos a 4 días por semana: se suma el viernes.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
     if(next===from+1){const ad=adds(S.pw);if(ad.length)m+=` Esta semana ${ad.length>1?'se suman':'se suma'}: ${ad.join(', ')}.`}
     if(easy&&S.bonus>b0&&cfg(S.pw).ds!=='all')m+=' Como todo te resultó fácil, te subo un poco: una repetición más (o 5 segundos) donde aún hay margen.'}
   S.ws=[];S.note=m}
@@ -558,7 +559,7 @@ const qty=(it)=>EX[it[0]].timed?`${it[2]} s`:`${it[2]}${EX[it[0]].side?' por lad
 const estMin=items=>Math.round(items.reduce((t,it)=>t+it[1]*((EX[it[0]].timed?it[2]+5:it[2]*(EX[it[0]].side?7:3.5))+cfg(S.pw).rest),0)/60);
 const nowTxt=()=>{const d=new Date();return d.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'})+' · '+pad(d.getHours())+':'+pad(d.getMinutes())};
 const curKey=()=>CYCLE[S.cycle%CYCLE.length];
-const plan=()=>S.plan||PRESET[S.days]||PRESET[3];
+const plan=()=>(S.plan&&S.plan.filter(Boolean).length===tDays())?S.plan:PRESET[tDays()];
 const goalN=()=>plan().filter(Boolean).length;
 const todayIdx=()=>(new Date().getDay()+6)%7;
 const nextDay=()=>{const t=todayIdx();for(let d=1;d<=7;d++){if(plan()[(t+d)%7])return d===1?'mañana':DAYN[(t+d)%7]}return 'mañana'};
@@ -572,7 +573,7 @@ function streakWeeks(){const set=new Set(S.sessions.map(s=>dkey(monday(new Date(
 
 /* ================= VISTAS ================= */
 const $=s=>document.querySelector(s);
-let tab='hoy', filt='todos', advOpen=false;
+let tab='hoy', filt='todos', advOpen=false, dayEdit=null;
 const ICON={hoy:'<path d="M13 3 5 14h6l-1 7 9-12h-6z"/>',ej:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',prog:'<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>',perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-6 8-6s7 1.500 8 6"/>'};
 function renderNav(){$('#nav').innerHTML=[['hoy','Hoy'],['ej','Ejercicios'],['prog','Progreso'],['perfil','Perfil']].map(([k,l])=>
   `<button class="${tab===k?'on':''}" data-act="tab" data-v="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}
@@ -645,12 +646,12 @@ function vPerfil(){
   const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${S[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   return `<div class="head"><div><div class="eyebrow">Tu plan</div><h1>Perfil</h1></div></div>
   <div class="two-col"><div><div class="card note" style="margin-bottom:14px"><p><b>Tu entrenador decide</b> la rutina de cada día, los ejercicios y cuándo subir la intensidad. Tú solo me dices qué días y a qué hora puedes.</p></div><div class="card">
-    <div class="set"><label>Días por semana</label>${seg('days',[[3,'3'],[4,'4'],[5,'5']])}<p>Con tu jornada, 3 días es lo que se sostiene. Sube a 4 cuando lleves un mes sin fallar.</p></div>
-    <div class="set"><label>Tus días de entreno</label><div class="seg">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" data-act="day" data-v="${i}" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Recomendado: ${REC[S.days]}. El sábado tienes más tiempo y el domingo se descansa. Toca un día para cambiarlo.</p></div>
+    <div class="set"><label>Tus días de entreno</label><div class="seg" style="pointer-events:none">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" tabindex="-1" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Los pongo yo: <b>${tDays()} días, ${REC[tDays()]}</b>. ${tDays()===3?'Las 4 primeras semanas son 3 días con descanso entre medias: es lo que tu cuerpo necesita para recuperarse y lo que se sostiene con tu jornada. En la semana 5 sumamos el viernes.':'Desde la fase Base son 4 días: es el volumen que hace falta para que se note el cambio.'} El domingo se descansa.</p></div>
     <div class="set"><label>Horario</label>${seg('when',[['am','Mañana'],['pm','Noche']])}<p>${S.when==='am'?'Recomendado si trabajas de 8:30 hasta la noche: la mañana es el único rato que el trabajo no te quita. Levántate a las 6:45, entrena y a la ducha.':'Funciona si entrenas nada más llegar, antes de cenar o sentarte. Si llegas agotado y lo saltas, pásate a la mañana.'}</p></div>
     <div class="set" style="margin:0"><label>Sonido</label>${seg('sound',[[true,'Activado'],[false,'Silencio']])}<p>Pitidos al acabar cada serie y cada descanso. El descanso lo marca el plan: ahora ${cfg(S.pw).rest} segundos.</p></div>
     <details${advOpen?' open':''} style="margin-top:18px"><summary class="small mut">Corregir la semana a mano</summary>
     <div class="set" style="margin:14px 0 0"><label>Semana del plan</label><div class="seg"><button data-act="pw" data-v="-1" aria-label="Semana anterior">−</button><button class="on" style="flex:3;pointer-events:none">Semana ${S.pw} · ${phase()[0]}</button><button data-act="pw" data-v="1" aria-label="Semana siguiente">+</button></div><p>No hace falta tocarla: sube sola según cómo valores cada sesión. Úsala solo si el plan te queda claramente fácil o claramente difícil.</p></div>
+    <div class="set" style="margin:18px 0 0"><label>¿Un día fijo no puedes?</label><div class="seg">${'LMXJVSD'.split('').map((l,i)=>`<button class="${(dayEdit||plan())[i]?'on':''}" data-act="day" data-v="${i}" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>${dayEdit?`<b style="color:var(--ac)">Marca ${tDays()} días: llevas ${dayEdit.filter(Boolean).length}.</b> `:''}Quita el día que no puedes y marca otro. Siempre son ${tDays()}: el número no se negocia. Evita tres días seguidos.</p></div>
     </details>
   </div>
   ${accountCard()}
@@ -686,7 +687,7 @@ function renderOb(){$('#onboard').innerHTML=`<div class="ob"><div class="logo">F
   <p class="mut">Solo necesitas una silla firme, una pared, una mesa, una mochila con libros y dos botellas de agua. Entre 15 y 30 minutos por sesión.</p>
   ${navigator.standalone?'':'<p class="small mut" style="margin-top:10px">¿En iPhone? Primero toca <b>Compartir</b> y «Agregar a Inicio», y abre Forja desde su icono: lo que configures aquí en Safari no pasa a la app.</p>'}
   <div class="sec"><h3>¿Desde dónde empiezas?</h3><div class="opt">${[1,2,3].map(l=>`<button class="${OB.level===l?'on':''}" data-act="ob" data-k="level" data-v="${l}"><b>${LEVELS[l][0]}</b><span>${LEVELS[l][1]}</span></button>`).join('')}</div></div>
-  <div class="sec"><h3>¿Cuántos días por semana?</h3><div class="seg">${[3,4,5].map(d=>`<button class="${OB.days===d?'on':''}" data-act="ob" data-k="days" data-v="${d}">${d} días</button>`).join('')}</div><p class="small mut" style="margin-top:10px">Te propongo ${REC[OB.days]}. Con jornadas largas, 3 días es lo que se sostiene.</p></div>
+  <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo: empiezas con <b>3 días, lunes, miércoles y sábado</b>. En la fase Base (semana 5) sumamos el viernes. El domingo se descansa.</p></div></div>
   <div class="sec"><h3>¿A qué hora?</h3><div class="opt">${[['am','Por la mañana · recomendado','Si trabajas de 8:30 hasta la noche: a las 6:45, antes de salir'],['pm','Por la noche','Al llegar a casa, antes de cenar']].map(([v,t,d])=>`<button class="${OB.when===v?'on':''}" data-act="ob" data-k="when" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>
   <div class="sec"><h3>Tu peso actual (opcional)</h3><div class="field"><input id="obKg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="kg" aria-label="Peso actual en kilos"></div></div>
   <div class="sec"><button class="btn pri xl" data-act="obGo" style="width:100%">Crear mi plan</button>
@@ -768,12 +769,12 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
   if(actx&&actx.state!=='running')actx.resume().catch(()=>{});
   if(P&&P.lockUntil>Date.now()&&['doneSet','skipRest','plus','pause','skipEx'].includes(a))return;
   switch(a){
-    case 'tab':tab=v;render();scrollTo(0,0);break;
+    case 'tab':tab=v;dayEdit=null;render();scrollTo(0,0);break;
     case 'filt':filt=v;render();break;
     case 'ex':openEx(v);break;
     case 'closeSheet':history.back();break;
     case 'set':S[b.dataset.k]=cast(v);if(b.dataset.k==='days')S.plan=null;save();render();break;
-    case 'day':{const pl=[...plan()];pl[+v]=pl[+v]?0:1;if(pl.some(Boolean)){S.plan=pl;save();render()}}break;
+    case 'day':{advOpen=true;const pl=[...(dayEdit||plan())];pl[+v]=pl[+v]?0:1;if(pl.filter(Boolean).length===tDays()){S.plan=pl;dayEdit=null;save()}else dayEdit=pl;render()}break;
     case 'break':startWorkout('P');break;
     case 'rate':applyRate(v,false);break;
     case 'gate':closeWeek('adv',v==='1');P.sub=null;save();renderDone();break;
