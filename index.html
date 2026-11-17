@@ -100,11 +100,6 @@ nav button.on svg{stroke:var(--ac)}
 
 .hscroll{display:flex;gap:10px;overflow-x:auto;margin:0 -20px;padding:0 20px 4px;scrollbar-width:none}
 .hscroll::-webkit-scrollbar{display:none}
-.pick{flex:none;width:168px;text-align:left;padding:14px;border-radius:18px;background:var(--s1);border:1px solid var(--line)}
-.pick.on{border-color:var(--ac);background:var(--acbg)}
-.pick b{display:block;font-size:16px;margin-top:8px}
-.pick span{font-size:13px;color:var(--mut)}
-.pick .l{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ac2)}
 
 .filters{display:flex;gap:8px;overflow-x:auto;margin:0 -20px 16px;padding:0 20px;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
@@ -388,21 +383,21 @@ const GROUPS=[['todos','Todos'],['pecho','Pecho'],['espalda','Espalda'],['hombro
 /* ================= RUTINAS ================= */
 const RT={
 A:{name:'Pecho y brazos',focus:'Empuje',desc:'Pecho firme, hombros y tríceps.',first:{1:'flex_pared',2:'flex_incl',3:'flex'},lv:{
- 1:[['marcha',1,40],['flex_pared',3,10],['flex_incl',2,6],['press',3,10],['curl',2,10],['plancha',3,20]],
- 2:[['boxeo',1,45],['flex_incl',3,10],['flex_rod',3,8],['press',3,12],['fondos',2,8],['curl',3,12],['plancha',3,30]],
- 3:[['boxeo',1,60],['flex',3,8],['flex_decl',2,6],['pike',3,8],['fondos',3,10],['curl',3,12],['plancha',3,45]]}},
+ 1:[['marcha',1,40],['flex_pared',3,10],['flex_incl',2,6],['press',3,10],['curl',2,10,2],['plancha',3,20,3]],
+ 2:[['boxeo',1,45],['flex_incl',3,10],['flex_rod',3,8],['press',3,12],['fondos',2,8,3],['curl',3,12,2],['plancha',3,30]],
+ 3:[['boxeo',1,60],['flex',3,8],['flex_decl',2,6],['pike',3,8,3],['fondos',3,10],['curl',3,12,2],['plancha',3,45]]}},
 B:{name:'Piernas y core',focus:'Tren inferior',desc:'El día que más calorías gasta.',first:{1:'sentadilla',2:'sentadilla',3:'zancada'},lv:{
- 1:[['marcha',1,40],['sentadilla',3,10],['puente',3,12],['talones',2,15],['crunch',3,10],['birddog',2,6]],
- 2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30],['elev_piernas',2,10],['escalador',3,20]],
- 3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['wallsit',3,45],['puente',3,15],['elev_piernas',3,12],['escalador',3,30]]}},
+ 1:[['marcha',1,40],['sentadilla',3,10],['puente',3,12],['talones',2,15,2],['crunch',3,10],['birddog',2,6,3]],
+ 2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30,2],['elev_piernas',2,10,3],['escalador',3,20]],
+ 3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['wallsit',3,45,2],['puente',3,15],['elev_piernas',3,12,3],['escalador',3,30]]}},
 C:{name:'Espalda y postura',focus:'Tirón',desc:'Abre los hombros y endereza la espalda.',first:{1:'remo',2:'remo',3:'remo'},lv:{
- 1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6],['plancha',2,20]],
- 2:[['boxeo',1,45],['remo',4,12],['superman',3,10],['flex_incl',3,10],['curl',3,12],['birddog',3,8],['plancha',3,30]],
- 3:[['boxeo',1,60],['remo',4,15],['superman',3,12],['pike',2,8],['flex',3,8],['curl',4,12],['plancha',3,45]]}},
+ 1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6,2],['plancha',2,20,3]],
+ 2:[['boxeo',1,45],['remo',4,12],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['birddog',3,8,3],['plancha',3,30]],
+ 3:[['boxeo',1,60],['remo',4,15],['superman',3,12],['pike',2,8,3],['flex',3,8],['curl',4,12,2],['plancha',3,45]]}},
 D:{name:'Cuerpo completo',focus:'Quema',desc:'Todo el cuerpo a buen ritmo.',first:{1:'boxeo',2:'escalador',3:'escalador'},lv:{
- 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['boxeo',3,30],['crunch',2,10]],
- 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['boxeo',3,40],['elev_piernas',2,10]],
- 3:[['boxeo',1,60],['zancada',3,12],['flex',3,8],['escalador',3,30],['remo',3,15],['flex_decl',2,6],['plancha',3,45]]}}
+ 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['boxeo',3,30,3],['crunch',2,10,2]],
+ 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['boxeo',3,40,3],['elev_piernas',2,10,2]],
+ 3:[['boxeo',1,60],['zancada',3,12],['flex',3,8],['escalador',3,30],['remo',3,15,3],['flex_decl',2,6],['plancha',3,45,2]]}}
 };
 const CYCLE=['A','B','C','D'];
 {const x=[['sentadilla',1,10],['flex_pared',1,10],['talones',1,15]];RT.P={name:'Pausa activa',focus:'Trabajo',desc:'',first:{1:'sentadilla',2:'sentadilla',3:'sentadilla'},lv:{1:x,2:x,3:x}}}
@@ -436,13 +431,24 @@ function modifier(week,items,i,bonus=0,ease=false){
 }
 const SUB={fondos:['press',12],pike:['press',12],flex_decl:['flex_incl',10],flex:['flex_rod',8],flex_rod:['flex_incl',10],zancada:['puente',15],wallsit:['puente',15],elev_piernas:['crunch',10],superman:['birddog',6],escalador:['marcha',40]};
 const subOf=id=>{while(S.swap[id]&&SUB[id])id=SUB[id][0];return id};
-function routine(k){
+const pwk=w=>(S.hold&&w>=9)?4:((w-1)%4)+1;
+function routine(k,w=S.pw,n=pwk(w)){
   if(k==='P')return RT.P.lv[1];
-  let base=RT[k].lv[lv()].map(x=>[...x]);const ids=new Set(base.map(x=>x[0])),extra={};
+  const now=w===S.pw;
+  let base=RT[k].lv[cfg(w).lv].filter(x=>(x[3]||1)<=n).map(x=>x.slice(0,3));const ids=new Set(base.map(x=>x[0])),extra={};
   base=base.flatMap(it=>{let id=it[0],v=it[2];while(S.swap[id]&&SUB[id]){v=SUB[id][1];id=SUB[id][0]}if(id===it[0])return [it];if(ids.has(id)){extra[id]=(extra[id]||0)+1;return []}ids.add(id);return [[id,it[1],v]]});
   base.forEach((x,i)=>{if(i>0&&extra[x[0]])x[1]=Math.min(4,x[1]+extra[x[0]])});
-  return base.map((_,i)=>modifier(S.pw,base,i,S.bonus,S.ease));
+  if(n<4&&base.length<4)return routine(k,w,4);
+  return base.map((_,i)=>modifier(w,base,i,now?S.bonus:0,now&&S.ease));
 }
+/* qué sube respecto a la semana anterior del plan (solo aumentos) */
+function delta(k){const out={};if(S.pw<2||S.rep>0)return out;const prev=new Map(routine(k,S.pw-1).map(x=>[x[0],x]));
+  routine(k).forEach((it,i)=>{if(isWarm(it,i))return;const p=prev.get(it[0]),ds=p?it[1]-p[1]:0;
+    out[it[0]]=!p?'Nuevo':ds>0?`+${ds} serie${ds>1?'s':''}`:it[2]>p[2]?`+${it[2]-p[2]}${EX[it[0]].timed?' s':' rep'}`:''});return out}
+function adds(w){if(w<2||w>12)return [];const u=x=>new Set(CYCLE.flatMap(k=>routine(k,x).map(i=>i[0]))),a=u(w-1);return [...u(w)].filter(id=>!a.has(id)).map(id=>EX[id].name.toLowerCase())}
+const DAY3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+function schedule(){const w=weekInfo(),ti=todayIdx(),by={};S.sessions.forEach(s=>by[s.d]=s.r);let j=0;
+  return w.days.map((d,i)=>d.done?[i,(RT[by[d.k]]||RT.A).name,'Hecho']:(!d.plan||i<ti)?null:[i,RT[CYCLE[(S.cycle+j++)%CYCLE.length]].name,i===ti?'Hoy':'']).filter(Boolean)}
 function note(id){const w=S.pw;
   if(id==='fondos')return 'Rodillas dobladas y pies cerca. Baja poco: codo a 90° como máximo. Si molesta delante del hombro, sáltalo y en «Ver técnica» toca «Me molesta este ejercicio».';
   if(id==='flex_incl'&&w<=2)return 'Estas dos semanas, manos en una mesa o encimera. Pasa a la silla cuando salgan todas las series.';
@@ -465,6 +471,7 @@ function closeWeek(o,pass){
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
     S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
     if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
+    if(next===from+1){const ad=adds(S.pw);if(ad.length)m+=` Esta semana ${ad.length>1?'se suman':'se suma'}: ${ad.join(', ')}.`}
     if(easy&&S.bonus>b0&&cfg(S.pw).ds!=='all')m+=' Como todo te resultó fácil, te subo un poco: una repetición más (o 5 segundos) donde aún hay margen.'}
   S.ws=[];S.note=m}
 function checkGap(){const l=S.sessions[S.sessions.length-1];if(!l||S.gapFor===l.d)return;
@@ -550,7 +557,7 @@ const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+pad(s%60)};
 const qty=(it)=>EX[it[0]].timed?`${it[2]} s`:`${it[2]}${EX[it[0]].side?' por lado':''}`;
 const estMin=items=>Math.round(items.reduce((t,it)=>t+it[1]*((EX[it[0]].timed?it[2]+5:it[2]*(EX[it[0]].side?7:3.5))+cfg(S.pw).rest),0)/60);
 const nowTxt=()=>{const d=new Date();return d.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'})+' · '+pad(d.getHours())+':'+pad(d.getMinutes())};
-const curKey=()=>S.pick||CYCLE[S.cycle%CYCLE.length];
+const curKey=()=>CYCLE[S.cycle%CYCLE.length];
 const plan=()=>S.plan||PRESET[S.days]||PRESET[3];
 const goalN=()=>plan().filter(Boolean).length;
 const todayIdx=()=>(new Date().getDay()+6)%7;
@@ -565,7 +572,7 @@ function streakWeeks(){const set=new Set(S.sessions.map(s=>dkey(monday(new Date(
 
 /* ================= VISTAS ================= */
 const $=s=>document.querySelector(s);
-let tab='hoy', filt='todos';
+let tab='hoy', filt='todos', advOpen=false;
 const ICON={hoy:'<path d="M13 3 5 14h6l-1 7 9-12h-6z"/>',ej:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',prog:'<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>',perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4-6 8-6s7 1.500 8 6"/>'};
 function renderNav(){$('#nav').innerHTML=[['hoy','Hoy'],['ej','Ejercicios'],['prog','Progreso'],['perfil','Perfil']].map(([k,l])=>
   `<button class="${tab===k?'on':''}" data-act="tab" data-v="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}
@@ -580,27 +587,30 @@ function vHoy(){
     rest:`El descanso también construye. Camina 30 minutos y vuelves ${nextDay()}.`,catch:`Te quedó una sesión pendiente esta semana. Son ${est} minutos.`}[st];
   const cta={go:'Empezar entreno',catch:'Empezar entreno',rest:'Entrenar igual',done:'Entrenar otra vez'}[st],pri=st==='go'||st==='catch';
   const coach=S.note?`<div class="card banner"><p><b>Tu entrenador:</b> ${S.note}</p><button class="btn sm" data-act="noteOk">Vale</button></div>`:'';
+  const dl=delta(k),sch=schedule(),nx=S.pw<12&&!S.hold?adds(S.pw+1):[];
+  const up=S.pw===8?'Al cerrar esta semana te pregunto por las flexiones: con 10 clásicas abrimos la fase Forja.':S.pw>=12?'Al cerrar esta semana completas el ciclo.':S.hold?'La próxima semana sube un poco más cada ejercicio.':`Próxima semana: ${FOCUS[S.pw+1]}${nx.length?`. Se ${nx.length>1?'suman':'suma'}: ${nx.join(', ')}`:''}.`;
   const hero=(items.find((it,i)=>!isWarm(it,i))||items[0])[0];
   return `<div class="head"><div><div class="eyebrow" id="clock">${nowTxt()}</div><h1>${H}</h1><p class="mut" style="margin-top:10px;max-width:34em">${sub}</p></div></div>
   ${coach}
   <div class="two-col"><div>
     <div class="card hero">${stage(hero,true)}
-      <div class="body"><span class="chip ac">Rutina ${k} · ${r.name}</span> <span class="chip">Semana ${S.pw} · ${ph[0]}</span>
+      <div class="body"><span class="chip ac">${r.name}</span> <span class="chip">Semana ${S.pw} · ${ph[0]}</span>
         <div class="meta"><div><b class="num">${est}</b>minutos</div><div><b class="num">${items.length}</b>ejercicios</div><div><b class="num">${sets}</b>series</div></div>
         <button class="btn ${pri?'pri':''} xl" data-act="start" style="width:100%"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>${cta}</button>
       </div></div>
     <div class="sec"><h3>Tu plan de 12 semanas</h3><div class="card">
       <div class="plan12">${Array.from({length:12},(_,i)=>`<i class="${i+1<S.pw?'d':i+1===S.pw?'c':''}"></i>`).join('')}</div>
       <p style="margin-top:14px"><b>Semana ${S.pw} · fase ${ph[0]}:</b> ${focus()}.</p>
-      <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de la semana ${S.pw} del plan. La intensidad sube sola: al terminar cada sesión me dices cómo fue y yo ajusto series y repeticiones.</p></div></div>
+      <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de la semana ${S.pw} del plan. Yo elijo la rutina de cada día y voy sumando ejercicios, series y repeticiones; tú solo me dices al terminar cómo fue.</p>
+      <p class="small" style="margin-top:10px"><b>Lo que viene:</b> <span class="mut">${up}</span></p></div></div>
     <div class="sec"><h3>Tu semana</h3><div class="card"><div class="week">
       <div class="days">${w.days.map((d,i)=>`<div class="d ${d.plan?'plan':''} ${d.done?'done':''} ${d.today?'today':''}"><i></i>${'LMXJVSD'[i]}</div>`).join('')}</div>
       <div class="goal"><b class="num">${w.count}/${goalN()}</b>sesiones</div></div>
-      <p class="small mut" style="margin-top:12px">Días marcados: tu plan. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}. Los demás días, camina.</p></div></div>
+      <div style="margin-top:14px">${sch.map(([i,n,t])=>`<div class="hist"><span><b>${DAY3[i]}</b> <span class="mut">· ${n}</span></span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
+      <p class="small mut" style="margin-top:12px">Lo que toca cada día lo decido yo. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}. Los demás días, camina.</p></div></div>
     <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Muchas horas sentado apagan el cuerpo. Levántate y hazla 2 o 3 veces en tu jornada.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
-    <div class="sec"><h3>Cambiar rutina</h3><div class="hscroll">${CYCLE.map(c=>`<button class="pick ${c===k?'on':''}" data-act="pick" data-v="${c}"><span class="l">RUTINA ${c}</span><b>${RT[c].name}</b><span>${RT[c].desc}</span></button>`).join('')}</div></div>
   </div><div>
-    <div class="sec"><h3>Ejercicios de la sesión</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small>${EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones'}</small></div></button>`).join('')}</div>
+    <div class="sec"><h3>Ejercicios de la sesión</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
     <p class="small mut" style="margin:14px 4px 0">Termina cada serie pudiendo hacer 2 más. Dolor punzante en hombro, rodilla o espalda: para y salta ese ejercicio.</p></div>
   </div></div>`;
 }
@@ -634,12 +644,14 @@ function vProg(){
 function vPerfil(){
   const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${S[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   return `<div class="head"><div><div class="eyebrow">Tu plan</div><h1>Perfil</h1></div></div>
-  <div class="two-col"><div><div class="card">
-    <div class="set"><label>Semana del plan</label><div class="seg"><button data-act="pw" data-v="-1" aria-label="Semana anterior">−</button><button class="on" style="flex:3;pointer-events:none">Semana ${S.pw} · ${phase()[0]}</button><button data-act="pw" data-v="1" aria-label="Semana siguiente">+</button></div><p>Sube sola según cómo valores cada sesión. Cámbiala a mano solo si te queda claramente fácil o claramente difícil.</p></div>
+  <div class="two-col"><div><div class="card note" style="margin-bottom:14px"><p><b>Tu entrenador decide</b> la rutina de cada día, los ejercicios y cuándo subir la intensidad. Tú solo me dices qué días y a qué hora puedes.</p></div><div class="card">
     <div class="set"><label>Días por semana</label>${seg('days',[[3,'3'],[4,'4'],[5,'5']])}<p>Con tu jornada, 3 días es lo que se sostiene. Sube a 4 cuando lleves un mes sin fallar.</p></div>
     <div class="set"><label>Tus días de entreno</label><div class="seg">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" data-act="day" data-v="${i}" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Recomendado: ${REC[S.days]}. El sábado tienes más tiempo y el domingo se descansa. Toca un día para cambiarlo.</p></div>
     <div class="set"><label>Horario</label>${seg('when',[['am','Mañana'],['pm','Noche']])}<p>${S.when==='am'?'Recomendado si trabajas de 8:30 hasta la noche: la mañana es el único rato que el trabajo no te quita. Levántate a las 6:45, entrena y a la ducha.':'Funciona si entrenas nada más llegar, antes de cenar o sentarte. Si llegas agotado y lo saltas, pásate a la mañana.'}</p></div>
     <div class="set" style="margin:0"><label>Sonido</label>${seg('sound',[[true,'Activado'],[false,'Silencio']])}<p>Pitidos al acabar cada serie y cada descanso. El descanso lo marca el plan: ahora ${cfg(S.pw).rest} segundos.</p></div>
+    <details${advOpen?' open':''} style="margin-top:18px"><summary class="small mut">Corregir la semana a mano</summary>
+    <div class="set" style="margin:14px 0 0"><label>Semana del plan</label><div class="seg"><button data-act="pw" data-v="-1" aria-label="Semana anterior">−</button><button class="on" style="flex:3;pointer-events:none">Semana ${S.pw} · ${phase()[0]}</button><button data-act="pw" data-v="1" aria-label="Semana siguiente">+</button></div><p>No hace falta tocarla: sube sola según cómo valores cada sesión. Úsala solo si el plan te queda claramente fácil o claramente difícil.</p></div>
+    </details>
   </div>
   ${accountCard()}
   <div class="sec"><h3>Instalar en tu iPhone</h3><div class="card note"><p>Abre esta página en <b>Safari</b>, toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba; a veces está dentro de <b>···</b>) y elige <b>«Agregar a Inicio»</b> o «Añadir a pantalla de inicio». Queda con su icono, a pantalla completa y funciona sin internet. Instálala primero y configúrala después: los datos se guardan solo en la app instalada. Con el iPhone en silencio, los pitidos no suenan.</p></div></div>
@@ -758,7 +770,6 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
   switch(a){
     case 'tab':tab=v;render();scrollTo(0,0);break;
     case 'filt':filt=v;render();break;
-    case 'pick':S.pick=v;save();render();break;
     case 'ex':openEx(v);break;
     case 'closeSheet':history.back();break;
     case 'set':S[b.dataset.k]=cast(v);if(b.dataset.k==='days')S.plan=null;save();render();break;
@@ -767,7 +778,7 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
     case 'rate':applyRate(v,false);break;
     case 'gate':closeWeek('adv',v==='1');P.sub=null;save();renderDone();break;
     case 'noteOk':S.note='';save();render();break;
-    case 'pw':{const n=Math.min(12,Math.max(1,S.pw+(+v)));if(n===S.pw)break;S.pw=n;S.ws=[];S.rep=0;S.bonus=0;S.ease=false;if(S.pw<9)S.hold=false;save();render()}break;
+    case 'pw':{advOpen=true;const n=Math.min(12,Math.max(1,S.pw+(+v)));if(n===S.pw)break;S.pw=n;S.ws=[];S.rep=0;S.bonus=0;S.ease=false;if(S.pw<9)S.hold=false;save();render()}break;
     case 'swap':if(S.swap[v])delete S.swap[v];else S.swap[v]=true;save();openEx(v);if(!P)render();break;
     case 'ob':OB[b.dataset.k]=cast(v);{const kg=$('#obKg').value;renderOb();$('#obKg').value=kg}break;
     case 'obGo':{const kg=parseFloat($('#obKg').value);S.pw={1:1,2:5,3:9}[OB.level];S.note='Empezamos '+(S.pw===1?'de cero y a propósito suave':'con una semana suave')+'. Hoy no se trata de sufrir: se trata de volver la próxima vez. Hazte hoy una foto y mídete la cintura: las compararás en la semana 12.';S.days=OB.days;S.when=OB.when;S.plan=null;S.since=dkey();S.setup=true;if(kg>=30&&kg<=250)S.weights.push({d:dkey(),kg:Math.round(kg*10)/10});save();$('#onboard').classList.remove('on');render()}break;
