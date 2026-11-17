@@ -417,8 +417,8 @@ const lv=()=>cfg(S.pw).lv;
 const FOCUS=[null,'despertar el cuerpo','sumar series','todas las series','rutina completa','movimientos nuevos, semana suave','sumar series','todas las series','base completa y test de flexiones','flexión clásica, semana suave','sumar series','todas las series','semana cumbre'];
 const focus=()=>(S.hold&&S.pw>=9)?'un poco más que la semana pasada':FOCUS[S.pw];
 const phase=()=>S.pw<=4?['Arranque','Aprender los movimientos y crear el hábito.']:S.pw<=8?['Base','Ejercicios nuevos y más trabajo.']:S.hold?['Base+','Un poco más cada semana hasta que salga la flexión clásica.']:['Forja','Flexión clásica y cuerpo completo.'];
-const tDays=()=>S.pw>=5?4:3;
-const need=()=>tDays();
+const tDays=()=>(S.pw>=9&&!S.hold)?5:S.pw>=5?4:3;
+const need=()=>Math.min(4,tDays());
 const isWarm=(it,i)=>i===0&&it[1]===1;
 const capOf=id=>['fondos','flex_decl','pike'].includes(id)?10:['flex_pared','flex_incl','flex_rod','flex'].includes(id)?15:['superman','elev_piernas'].includes(id)?12:EX[id].side?12:EX[id].timed?60:['sentadilla','puente','talones'].includes(id)?20:16;
 function modifier(week,items,i,bonus=0,ease=false){
@@ -467,7 +467,7 @@ function closeWeek(o,pass){
     S.pw=Math.max(1,from-1);S.rep=0;S.bonus=0;if(S.pw<9)S.hold=false}
   else if(o==='repeat'){S.rep++;S.bonus=0;m='Esta semana se repite. No es un castigo: el cuerpo pide una vuelta más antes de subir.'}
   else{let next=from+1,easy=F===n;const b0=S.bonus;if(easy)S.bonus=Math.min(2,S.bonus+1);
-    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave.'}
+    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Y pasamos a 5 días: lunes, martes, jueves, viernes y sábado.'}
       else m='Seguimos en Base con un poco más cada semana. No es ir atrás: es llegar fuerte a la flexión clásica. Te lo vuelvo a preguntar la semana que viene.'}
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
     S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
@@ -590,6 +590,7 @@ function vHoy(){
   const coach=S.note?`<div class="card banner"><p><b>Tu entrenador:</b> ${S.note}</p><button class="btn sm" data-act="noteOk">Vale</button></div>`:'';
   const dl=delta(k),sch=schedule(),nx=S.pw<12&&!S.hold?adds(S.pw+1):[];
   const up=S.pw===8?'Al cerrar esta semana te pregunto por las flexiones: con 10 clásicas abrimos la fase Forja.':S.pw>=12?'Al cerrar esta semana completas el ciclo.':S.hold?'La próxima semana sube un poco más cada ejercicio.':`Próxima semana: ${FOCUS[S.pw+1]}${nx.length?`. Se ${nx.length>1?'suman':'suma'}: ${nx.join(', ')}`:''}.`;
+  const upD=S.pw===4?' Pasamos a 4 días: se suma el viernes.':'';
   const hero=(items.find((it,i)=>!isWarm(it,i))||items[0])[0];
   return `<div class="head"><div><div class="eyebrow" id="clock">${nowTxt()}</div><h1>${H}</h1><p class="mut" style="margin-top:10px;max-width:34em">${sub}</p></div></div>
   ${coach}
@@ -603,7 +604,7 @@ function vHoy(){
       <div class="plan12">${Array.from({length:12},(_,i)=>`<i class="${i+1<S.pw?'d':i+1===S.pw?'c':''}"></i>`).join('')}</div>
       <p style="margin-top:14px"><b>Semana ${S.pw} · fase ${ph[0]}:</b> ${focus()}.</p>
       <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de la semana ${S.pw} del plan. Yo elijo la rutina de cada día y voy sumando ejercicios, series y repeticiones; tú solo me dices al terminar cómo fue.</p>
-      <p class="small" style="margin-top:10px"><b>Lo que viene:</b> <span class="mut">${up}</span></p></div></div>
+      <p class="small" style="margin-top:10px"><b>Lo que viene:</b> <span class="mut">${up}${upD}</span></p></div></div>
     <div class="sec"><h3>Tu semana</h3><div class="card"><div class="week">
       <div class="days">${w.days.map((d,i)=>`<div class="d ${d.plan?'plan':''} ${d.done?'done':''} ${d.today?'today':''}"><i></i>${'LMXJVSD'[i]}</div>`).join('')}</div>
       <div class="goal"><b class="num">${w.count}/${goalN()}</b>sesiones</div></div>
@@ -646,7 +647,7 @@ function vPerfil(){
   const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${S[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   return `<div class="head"><div><div class="eyebrow">Tu plan</div><h1>Perfil</h1></div></div>
   <div class="two-col"><div><div class="card note" style="margin-bottom:14px"><p><b>Tu entrenador decide</b> la rutina de cada día, los ejercicios y cuándo subir la intensidad. También los días y el ritmo. Tú solo eliges si entrenas por la mañana o por la noche.</p></div><div class="card">
-    <div class="set"><label>Tus días de entreno</label><div class="seg" style="pointer-events:none">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" tabindex="-1" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Los pongo yo: <b>${tDays()} días, ${REC[tDays()]}</b>. ${tDays()===3?'Las 4 primeras semanas son 3 días con descanso entre medias: es lo que tu cuerpo necesita para recuperarse y lo que se sostiene con tu jornada. En la semana 5 sumamos el viernes.':'Desde la fase Base son 4 días: es el volumen que hace falta para que se note el cambio.'} El domingo se descansa.</p></div>
+    <div class="set"><label>Tus días de entreno</label><div class="seg" style="pointer-events:none">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" tabindex="-1" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Los pongo yo: <b>${tDays()} días, ${REC[tDays()]}</b>. ${tDays()===3?'Las 4 primeras semanas son 3 días con descanso entre medias: es lo que tu cuerpo necesita para recuperarse y lo que se sostiene con tu jornada. En la semana 5 sumamos el viernes.':tDays()===4?'En la fase Base son 4 días: es el volumen que hace falta para que se note el cambio. Cuando abras la fase Forja pasamos a 5.':'En la fase Forja son 5 días, con el miércoles y el domingo de descanso. La semana se cierra con 4 sesiones; la quinta suma.'} El domingo se descansa.</p></div>
     <div class="set"><label>Horario</label>${seg('when',[['am','Mañana'],['pm','Noche']])}<p>${S.when==='am'?'Recomendado si trabajas de 8:30 hasta la noche: la mañana es el único rato que el trabajo no te quita. Levántate a las 6:45, entrena y a la ducha.':'Funciona si entrenas nada más llegar, antes de cenar o sentarte. Si llegas agotado y lo saltas, pásate a la mañana.'}</p></div>
     <div class="set" style="margin:0"><label>Sonido</label>${seg('sound',[[true,'Activado'],[false,'Silencio']])}<p>Pitidos al acabar cada serie y cada descanso. El descanso lo marca el plan: ahora ${cfg(S.pw).rest} segundos.</p></div>
   </div>
@@ -682,7 +683,7 @@ let OB={level:1,days:3,when:'am'};
 function renderOb(){$('#onboard').innerHTML=`<div class="ob"><div class="logo">FORJA</div><h1>Entrena en casa.<br>Sin máquinas.</h1>
   <p class="mut">Solo necesitas una silla firme, una pared, una mesa, una mochila con libros y dos botellas de agua. Entre 15 y 30 minutos por sesión.</p>
   ${navigator.standalone?'':'<p class="small mut" style="margin-top:10px">¿En iPhone? Primero toca <b>Compartir</b> y «Agregar a Inicio», y abre Forja desde su icono: lo que configures aquí en Safari no pasa a la app.</p>'}
-  <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo: empiezas con <b>3 días, lunes, miércoles y sábado</b>. En la semana 5 sumamos el viernes. El domingo se descansa. El ritmo también lo llevo yo: empiezas en la semana 1 y subo cuando tu cuerpo esté listo.</p></div></div>
+  <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo: empiezas con <b>3 días, lunes, miércoles y sábado</b>. En la semana 5 sumamos el viernes y en la fase final llegamos a 5 días. El domingo se descansa. El ritmo también lo llevo yo: empiezas en la semana 1 y subo cuando tu cuerpo esté listo.</p></div></div>
   <div class="sec"><h3>¿A qué hora?</h3><div class="opt">${[['am','Por la mañana · recomendado','Si trabajas de 8:30 hasta la noche: a las 6:45, antes de salir'],['pm','Por la noche','Al llegar a casa, antes de cenar']].map(([v,t,d])=>`<button class="${OB.when===v?'on':''}" data-act="ob" data-k="when" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>
   <div class="sec"><h3>Tu peso actual (opcional)</h3><div class="field"><input id="obKg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="kg" aria-label="Peso actual en kilos"></div></div>
   <div class="sec"><button class="btn pri xl" data-act="obGo" style="width:100%">Crear mi plan</button>
