@@ -447,30 +447,35 @@ const GROUPS=[['todos','Todos'],['pecho','Pecho'],['espalda','Espalda'],['hombro
 /* ================= RUTINAS ================= */
 const RT={
 A:{name:'Pecho y brazos',focus:'Empuje',desc:'Pecho firme, hombros y tríceps.',lv:{
- 1:[['marcha',1,40],['flex_pared',3,10],['flex_incl',2,6],['press',3,10],['press_suelo',2,10,4],['curl',2,10,2],['plancha',3,20,3]],
- 2:[['trote',1,45],['flex_incl',3,10],['flex_rod',3,8],['press_suelo',3,12,2],['press',3,12],['fondos',2,8,3],['patada',2,10,4],['crunch_inv',3,10]],
- 3:[['trote',1,60],['flex',3,8],['flex_decl',2,6],['press_suelo',3,14,2],['pike',3,8,3],['fondos',3,10],['flex_diam',2,6,4],['plancha',3,45]]}},
+ 1:[['marcha',1,40],['flex_pared',3,10],['flex_incl',2,6],['press',3,10],['press_suelo',2,10,4],['curl',2,10,2],['elev_front',2,10,3]],
+ 2:[['marcha',1,60],['flex_incl',3,10],['flex_rod',3,8],['press_suelo',3,12,2],['press',3,12],['fondos',2,8,3],['patada',2,10,4],['curl',3,12]],
+ 3:[['trote',1,60],['flex',3,8],['flex_decl',2,6],['press_suelo',3,14,2],['pike',3,8,3],['fondos',3,10],['flex_diam',2,6,4],['patada',3,12]]}},
 B:{name:'Piernas y core',focus:'Tren inferior',desc:'El día que más calorías gasta.',lv:{
  1:[['marcha',1,40],['sentadilla',3,10],['puente',3,12],['talones',2,15,2],['crunch',3,10],['birddog',2,6,3],['deadbug',2,6,4]],
  2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30,2],['elev_piernas',2,10,3],['deadbug',2,8,4],['escalador',3,20]],
  3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['peso_muerto',2,12,4],['wallsit',3,45,2],['puente',2,15],['elev_piernas',2,12,3],['escalador',3,30]]}},
 C:{name:'Espalda y postura',focus:'Tirón',desc:'Abre los hombros y endereza la espalda.',lv:{
- 1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6,2],['plancha',2,20,3],['angel',2,10,4]],
- 2:[['trote',1,45],['remo',4,12],['peso_muerto',3,10,4],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['angel',2,12,3],['plancha',3,30]],
+ 1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6,2],['curl',2,10,3],['angel',2,10,4]],
+ 2:[['marcha',1,60],['remo',4,12],['peso_muerto',3,10,4],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['angel',2,12,3],['plancha',3,30]],
  3:[['trote',1,60],['remo',4,15],['peso_muerto',3,12],['flex',3,8],['curl',4,12,2],['pike',2,8,3],['elev_front',2,10,4],['plancha_toque',3,8]]}},
 D:{name:'Cuerpo completo',focus:'Quema',desc:'Todo el cuerpo a buen ritmo.',lv:{
- 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['trote',3,30,3],['crunch',2,10,2],['elev_front',2,10,4]],
- 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['trote',3,40,3],['bicicleta',2,10,2],['elev_front',2,12,4]],
+ 1:[['marcha',1,40],['sentadilla',3,10],['flex_pared',3,10],['puente',3,10],['jacks',3,30,3],['crunch',2,10,2],['elev_front',2,10,4]],
+ 2:[['marcha',1,60],['sentadilla',3,15],['flex_rod',3,8],['escalador',3,20],['remo',3,12],['jacks',3,40,3],['bicicleta',2,10,2],['elev_front',2,12,4]],
  3:[['trote',1,60],['zancada',3,12],['flex',3,8],['escalador',3,30],['remo',3,15,3],['flex_decl',2,6],['deadbug',2,8,4],['plancha',3,45,2]]}}
 };
 const CYCLE=['A','B','C','D'];
 {const x=[['sentadilla',1,10],['flex_pared',1,10],['talones',1,15]];RT.P={name:'Pausa activa',focus:'Trabajo',desc:'',lv:{1:x,2:x,3:x}}}
-RT.K={name:'Cardio y abdomen',focus:'Cardio',desc:'',lv:{
- 1:[['marcha',1,60],['jacks',4,30],['trote',3,40],['crunch',2,10],['plancha',2,20]],
- 2:[['marcha',1,60],['jacks',4,40],['trote',3,45],['escalador',2,20],['bicicleta',2,10],['crunch_inv',2,10]],
- 3:[['marcha',1,60],['jacks',4,45],['trote',3,45],['escalador',3,30],['bicicleta',3,12],['crunch_inv',2,12],['plancha_toque',2,8]]}};
-const PRESET={3:[1,0,1,0,0,1,0],4:[1,0,1,0,1,1,0],5:[1,1,0,1,1,1,0]};
-const REC={3:'lunes, miércoles y sábado',4:'lunes, miércoles, viernes y sábado',5:'lunes, martes, jueves, viernes y sábado'};
+RT.K={name:'Cardio suave',focus:'Cardio',desc:''};
+const KMIN=[0,15,15,20,20,20,25,25,25,25,30,30,30];
+function kRoutine(w=S.pw){const hold=S.hold&&w>=9,T=hold?25:KMIN[w],out=[['marcha',1,180]];
+  if(w>=9&&!hold){const n=w===9?6:8,h=w===9?30:40,F=['escalador','trote','jacks'];out.push(['marcha',1,420]);
+    for(let i=0;i<n;i++){out.push([F[i%3],1,h]);out.push(['marcha',1,60])}}
+  else{const cyc=w>=5?[['jacks',120],['escalador',40],['marcha',120]]:[['jacks',120],['marcha',120]];let rem=T*60-300,i=0;
+    while(rem>=30){const [id,t]=cyc[i++%cyc.length],v=rem-t<30?rem:Math.min(t,rem);out.push([id,1,v]);rem-=v}}
+  out.push(['marcha',1,120]);return out}
+const PRESET={3:[1,0,1,0,0,1,0],4:[1,0,1,0,1,1,0],5:[1,1,0,1,0,1,0]};
+const CPLAN={3:[0,1,0,0,0,0,0],33:[0,1,0,0,1,0,0],4:[0,1,0,0,0,0,0],5:[0,0,1,0,0,0,0]};
+const REC={3:'lunes, miércoles y sábado',4:'lunes, miércoles, viernes y sábado',5:'lunes, martes, jueves y sábado'};
 const DAYN=['el lunes','el martes','el miércoles','el jueves','el viernes','el sábado','el domingo'];
 const WHEN={am:['Por la mañana','6:45, antes de salir al trabajo'],pm:['Por la noche','al llegar a casa, antes de cenar']};
 const LEVELS={1:['Inicio','Vuelvo a moverme o empiezo de cero'],2:['Base','Hago 8 flexiones de rodillas seguidas'],3:['Fuerte','Hago 10 flexiones clásicas seguidas']};
@@ -485,8 +490,11 @@ const lv=()=>cfg(S.pw).lv;
 const FOCUS=[null,'despertar el cuerpo','sumar series','todas las series','rutina completa','movimientos nuevos, semana suave','sumar series','todas las series','base completa y test de flexiones','flexión clásica, semana suave','sumar series','todas las series','semana cumbre'];
 const focus=()=>(S.hold&&S.pw>=9)?'un poco más que la semana pasada':FOCUS[S.pw];
 const phase=()=>S.pw<=4?['Arranque','Aprender los movimientos y crear el hábito.']:S.pw<=8?['Base','Ejercicios nuevos y más trabajo.']:S.hold?['Base+','Un poco más cada semana hasta que salga la flexión clásica.']:['Forja','Flexión clásica y cuerpo completo.'];
-const tDays=()=>(S.pw>=9&&!S.hold)?5:S.pw>=5?4:3;
-const need=()=>Math.min(4,tDays());
+const phaseKey=()=>(S.pw>=9&&!S.hold)?5:S.pw>=5?4:3;
+const tDays=()=>phaseKey()===3?3:4;
+const need=()=>tDays();
+const cplan=()=>CPLAN[phaseKey()===3&&S.pw>=3?33:phaseKey()];
+const kOpt=()=>S.pw<=2;
 const isWarm=(it,i)=>i===0&&it[1]===1;
 const capOf=id=>['fondos','flex_decl','pike','flex_diam'].includes(id)?10:['flex_pared','flex_incl','flex_rod','flex'].includes(id)?15:['superman','elev_piernas'].includes(id)?12:EX[id].side?12:EX[id].timed?60:['sentadilla','puente','talones'].includes(id)?20:16;
 function modifier(week,items,i,bonus=0,ease=false){
@@ -503,7 +511,7 @@ const subOf=id=>{while(S.swap[id]&&SUB[id])id=SUB[id][0];return id};
 const pwk=w=>(S.hold&&w>=9)?4:((w-1)%4)+1;
 function routine(k,w=S.pw,n=pwk(w)){
   if(k==='P')return RT.P.lv[1];
-  if(k==='K')return RT.K.lv[cfg(S.pw).lv];
+  if(k==='K')return kRoutine();
   const now=w===S.pw;
   let base=RT[k].lv[cfg(w).lv].filter(x=>(x[3]||1)<=n).map(x=>x.slice(0,3));const ids=new Set(base.map(x=>x[0])),extra={};
   base=base.flatMap(it=>{let id=it[0],v=it[2];while(S.swap[id]&&SUB[id]){v=SUB[id][1];id=SUB[id][0]}if(id===it[0])return [it];if(ids.has(id)){extra[id]=(extra[id]||0)+1;return []}ids.add(id);return [[id,it[1],v]]});
@@ -516,20 +524,20 @@ function delta(k){const out={};if(S.pw<2||S.rep>0)return out;const prev=new Map(
   routine(k).forEach((it,i)=>{if(isWarm(it,i))return;const p=prev.get(it[0]),ds=p?it[1]-p[1]:0;
     out[it[0]]=!p?'Nuevo':ds>0?`+${ds} serie${ds>1?'s':''}`:it[2]>p[2]?`+${it[2]-p[2]}${EX[it[0]].timed?' s':' rep'}`:''});return out}
 function adds(w){if(w<2||w>12)return [];const u=x=>new Set(CYCLE.flatMap(k=>routine(k,x).map(i=>i[0]))),a=u(w-1);return [...u(w)].filter(id=>!a.has(id)).map(id=>EX[id].name.toLowerCase())}
-const WI={f:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',c:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',r:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',ok:'<path d="m5 12.5 4.5 4.5L19 7.5"/>'};
+const WI={f:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',c:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',r:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',ok:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',a:'<path d="M3 12c3-4 6 4 9 0s6 4 9 0"/>'};
 const wi=k=>`<svg viewBox="0 0 24 24">${WI[k]}</svg>`;
 const DAY3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-function schedule(){const w=weekInfo(),ti=todayIdx(),by={};S.sessions.forEach(s=>by[s.d]=s.r);let j=0;
-  const cd=new Set(S.cardio||[]);
+function schedule(){const w=weekInfo(),ti=todayIdx(),by={},cp=cplan(),cd=new Set(S.cardio||[]);S.sessions.forEach(s=>by[s.d]=s.r);let j=0;
   return w.days.map((d,i)=>{
     if(d.done)return [i,(RT[by[d.k]]||RT.A).name,'Hecho','f'];
     if(d.plan)return i<ti?null:[i,RT[CYCLE[(S.cycle+j++)%CYCLE.length]].name,i===ti?'Hoy':'','f'];
+    if(cd.has(d.k))return [i,'Cardio suave','Hecho','c'];
+    if(cp[i])return i<ti?null:[i,'Cardio suave'+(kOpt()?' (opcional)':''),i===ti?'Hoy':'','c'];
     if(i===6)return [i,'Descanso total',i===ti?'Hoy':'','r'];
-    if(cd.has(d.k))return [i,'Cardio y abdomen','Hecho','c'];
-    return i<ti?null:[i,'Cardio y abdomen',i===ti?'Hoy':'','c']}).filter(Boolean)}
+    return i<ti?null:[i,'Libre · solo pausas activas',i===ti?'Hoy':'','a']}).filter(Boolean)}
 function note(id){const w=S.pw;
-  if(id==='jacks'&&w<=4)return 'Estas semanas, sin salto: abre una pierna al lado y luego la otra mientras subes los brazos.';
-  if(id==='trote'&&w<=4)return 'Estas semanas, sin saltar: marcha rápida llevando el talón atrás.';
+  if(id==='jacks'&&w<=8)return 'Estas semanas, sin salto: abre una pierna al lado y luego la otra mientras subes los brazos.';
+  if(id==='trote'&&w<=8)return 'Estas semanas, sin saltar: marcha rápida llevando el talón atrás.';
   if(id==='fondos')return 'Rodillas dobladas y pies cerca. Baja poco: codo a 90° como máximo. Si molesta delante del hombro, sáltalo y en «Ver técnica» toca «Me molesta este ejercicio».';
   if(id==='flex_incl'&&w<=2)return 'Estas dos semanas, manos en una mesa o encimera. Pasa a la silla cuando salgan todas las series.';
   if(id==='sentadilla'&&w<=2)return 'Estas dos semanas, siéntate y levántate de una silla.';
@@ -546,11 +554,11 @@ function closeWeek(o,pass){
     S.pw=Math.max(1,from-1);S.rep=0;S.bonus=0;if(S.pw<9)S.hold=false}
   else if(o==='repeat'){S.rep++;S.bonus=0;m='Esta semana se repite. No es un castigo: el cuerpo pide una vuelta más antes de subir.'}
   else{let next=from+1,easy=F===n;const b0=S.bonus;if(easy)S.bonus=Math.min(2,S.bonus+1);
-    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Y pasamos a 5 días: lunes, martes, jueves, viernes y sábado.'}
+    if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Tus días cambian: fuerza lunes, martes, jueves y sábado, y cardio el miércoles.'}
       else m='Seguimos en Base con un poco más cada semana. No es ir atrás: es llegar fuerte a la flexión clásica. Te lo vuelvo a preguntar la semana que viene.'}
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
     S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
-    if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento. Y pasamos a 4 días por semana: se suma el viernes.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
+    if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento. Y pasamos a 4 días de fuerza: se suma el viernes, con un cardio el martes.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
     if(next===from+1){const ad=adds(S.pw);if(ad.length)m+=` Esta semana ${ad.length>1?'se suman':'se suma'}: ${ad.join(', ')}.`}
     if(easy&&S.bonus>b0&&cfg(S.pw).ds!=='all')m+=' Como todo te resultó fácil, te subo un poco: una repetición más (o 5 segundos) donde aún hay margen.'}
   S.ws=[];S.note=m}
@@ -639,7 +647,7 @@ const estMin=(items,rest=cfg(S.pw).rest)=>Math.round(items.reduce((t,it)=>t+it[1
 const cardioToday=()=>(S.cardio||[]).includes(dkey());
 const nowTxt=()=>{const d=new Date();return d.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'})+' · '+pad(d.getHours())+':'+pad(d.getMinutes())};
 const curKey=()=>CYCLE[S.cycle%CYCLE.length];
-const plan=()=>PRESET[tDays()];
+const plan=()=>PRESET[phaseKey()];
 const goalN=()=>plan().filter(Boolean).length;
 const todayIdx=()=>(new Date().getDay()+6)%7;
 const nextDay=()=>{const t=todayIdx();for(let d=1;d<=7;d++){if(plan()[(t+d)%7])return d===1?'mañana':DAYN[(t+d)%7]}return 'mañana'};
@@ -660,44 +668,47 @@ function renderNav(){$('#nav').innerHTML=[['hoy','Hoy'],['ej','Ejercicios'],['pr
 function render(){renderNav();$('#view').innerHTML=({hoy:vHoy,ej:vEj,prog:vProg,perfil:vPerfil})[tab]();mountAnims()}
 
 function vHoy(){
-  const k0=curKey(),w=weekInfo(),ti=todayIdx(),ph=phase();
+  const k0=curKey(),w=weekInfo(),ti=todayIdx(),ph=phase(),cp=cplan(),kd=routine('K'),kEst=estMin(kd,5);
   const owed=w.days.slice(0,ti).filter(d=>d.plan&&d.k>=(S.since||dkey())).length;
-  let st=w.days[ti].done?'done':plan()[ti]?'go':w.count<owed?'catch':'rest';
-  if(st==='rest'&&ti!==6&&!cardioToday())st='cardio';
-  const off=st==='rest'||st==='done',ck=st==='cardio',k=ck?'K':k0,r=RT[k],items=routine(k),sets=items.reduce((t,i)=>t+i[1],0),est=estMin(items,ck?30:undefined),nxt=RT[k0].name.toLowerCase(),kEst=estMin(routine('K'),30);
-  const H={go:`Hoy toca<br>${r.name.toLowerCase()}`,done:'Hecho<br>por hoy',rest:'Hoy<br>descansas',cardio:'Hoy toca<br>cardio y abdomen',catch:'Recupera<br>tu sesión'}[st];
-  const sub={go:`Tu hora: ${WHEN[S.when][1]}. Son ${est} minutos.`,done:`Buen trabajo. Vuelves ${nextDay()}: ${nxt}.`,cardio:`Hoy no hay fuerza. En lugar de la caminata, ${est} minutos de cardio y abdomen en casa. Fuerza ${nextDay()}: ${nxt}.`,
-    rest:ti===6?`Domingo de descanso total: el músculo crece hoy. Vuelves ${nextDay()}.`:`Cardio hecho. El descanso también construye. Vuelves ${nextDay()}.`,catch:`Te quedó una sesión pendiente esta semana. Son ${est} minutos.`}[st];
-  const cta={go:'Empezar entreno',catch:'Empezar entreno',cardio:'Empezar cardio',rest:'Adelantar la próxima sesión',done:'Entrenar otra vez'}[st],pri=st==='go'||st==='catch'||ck;
+  let st=w.days[ti].done?'done':plan()[ti]?'go':w.count<owed?'catch':(cp[ti]&&!cardioToday())?'cardio':'rest';
+  const off=st==='rest'||st==='done',ck=st==='cardio',k=ck?'K':k0,r=RT[k],items=ck?kd:routine(k),sets=items.reduce((t,i)=>t+i[1],0),est=ck?kEst:estMin(items),nxt=RT[k0].name.toLowerCase();
+  const restTxt=ti===6?'Domingo de descanso total: el músculo crece hoy.':cardioToday()?'Cardio hecho. Ahora toca recuperar.':'Hoy es día libre: el cuerpo se recupera y así rinde más mañana.';
+  const H={go:`Hoy toca<br>${r.name.toLowerCase()}`,done:'Hecho<br>por hoy',rest:ti===6?'Hoy<br>descansas':'Hoy<br>día libre',cardio:`Hoy toca<br>cardio suave${kOpt()?' <span style="font-size:.5em;color:var(--mut)">· opcional</span>':''}`,catch:'Recupera<br>tu sesión'}[st];
+  const sub={go:`Tu hora: ${WHEN[S.when][1]}. Son ${est} minutos.`,done:`Buen trabajo. Vuelves ${nextDay()}: ${nxt}.`,
+    cardio:`${est} minutos moviéndote sin parar, sin saltos ni abdominales: es tu caminata, pero en casa. ${kOpt()?'Estas dos primeras semanas es opcional: si hoy no puedes, no pasa nada. ':''}Si sales a caminar 20–30 minutos, cuenta igual.`,
+    rest:`${restTxt} Vuelves ${nextDay()}: ${nxt}.`,catch:`Te quedó una sesión pendiente esta semana. Son ${est} minutos.`}[st];
+  const cta={go:'Empezar entreno',catch:'Empezar entreno',cardio:'Empezar cardio',done:''}[st],pri=st==='go'||st==='catch'||ck;
   const coach=S.note?`<div class="card banner"><p><b>Tu entrenador:</b> ${S.note}</p><button class="btn sm" data-act="noteOk">Vale</button></div>`:'';
   const dl=ck?{}:delta(k),sch=schedule(),nx=S.pw<12&&!S.hold?adds(S.pw+1):[];
   const up=S.pw===8?'Al cerrar esta semana te pregunto por las flexiones: con 10 clásicas abrimos la fase Forja.':S.pw>=12?'Al cerrar esta semana completas el ciclo.':S.hold?'La próxima semana sube un poco más cada ejercicio.':`Próxima semana: ${FOCUS[S.pw+1]}${nx.length?`. Se ${nx.length>1?'suman':'suma'}: ${nx.join(', ')}`:''}.`;
-  const upD=S.pw===4?' Pasamos a 4 días: se suma el viernes.':'';
+  const upD=S.pw===2?' El cardio del martes deja de ser opcional y se suma otro el viernes.':S.pw===4?' Pasamos a 4 días de fuerza (se suma el viernes) y un cardio el martes.':'';
   const hero=(items.find((it,i)=>!isWarm(it,i))||items[0])[0];
+  const grp=[];if(ck)items.forEach(it=>{const g=grp.find(x=>x[0]===it[0]);g?g[1]+=it[2]:grp.push([it[0],it[2]])});
+  const cDone=w.days.filter(d=>(S.cardio||[]).includes(d.k)).length,cGoal=cp.filter(Boolean).length;
   return `<div class="head"><div><div class="eyebrow" id="clock">${nowTxt()}</div><h1>${H}</h1><p class="mut" style="margin-top:10px;max-width:34em">${sub}</p></div></div>
   ${coach}
   <div class="two-col"><div>
-    ${off?`<div class="card note"><p><b>Hoy no hay sesión.</b> ${st==='done'?'Ya cumpliste con la de hoy.':ti===6?'Es tu día de descanso total.':'Ya hiciste el cardio de hoy.'}</p><p style="margin-top:10px">Lo único que te pido hoy: 2 o 3 <b>pausas activas</b> en tu jornada.</p><button class="btn pri xl" data-act="break" style="width:100%;margin-top:14px">Hacer pausa activa · 2 min</button><p class="small mut" style="margin-top:14px">Próxima sesión ${nextDay()}: ${RT[k0].name.toLowerCase()}.</p></div>`:`<div class="card hero">${stage(hero,true)}
+    ${off?`<div class="card note"><p><b>Hoy no hay entreno.</b> ${st==='done'?'Ya cumpliste con la sesión de hoy.':ti===6?'Es tu día de descanso total.':cardioToday()?'Ya hiciste el cardio de hoy.':'Descansar también es parte del plan: no te quedas atrás.'}</p>${ti===6?'':'<p style="margin-top:10px">Lo único que te pido: 2 o 3 <b>pausas activas</b> en tu jornada.</p><button class="btn pri xl" data-act="break" style="width:100%;margin-top:14px">Hacer pausa activa · 2 min</button>'}<p class="small mut" style="margin-top:14px">Próxima sesión de fuerza ${nextDay()}: ${nxt}.</p></div>`:`<div class="card hero">${stage(hero,true)}
       <div class="body"><span class="chip ac">${r.name}</span> <span class="chip">${ck?'Sustituye la caminata':`Semana ${S.pw} · ${ph[0]}`}</span>
-        <div class="meta"><div><b class="num">${est}</b>minutos</div><div><b class="num">${items.length}</b>ejercicios</div><div><b class="num">${sets}</b>series</div></div>
+        <div class="meta"><div><b class="num">${est}</b>minutos</div><div><b class="num">${ck?grp.length:items.length}</b>${ck?'movimientos':'ejercicios'}</div>${ck?'<div><b class="num">0</b>abdominales</div>':`<div><b class="num">${sets}</b>series</div>`}</div>
         <button class="btn ${pri?'pri':''} xl" data-act="${ck?'cardio':'start'}" style="width:100%"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>${cta}</button>
       </div></div>`}
     <div class="sec"><h3>Tu plan de 12 semanas</h3><div class="card">
       <div class="plan12">${Array.from({length:12},(_,i)=>`<i class="${i+1<S.pw?'d':i+1===S.pw?'c':''}"></i>`).join('')}</div>
       <p style="margin-top:14px"><b>Semana ${S.pw} · fase ${ph[0]}:</b> ${focus()}.</p>
-      <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de la semana ${S.pw} del plan. Yo elijo la rutina de cada día y voy sumando ejercicios, series y repeticiones; tú solo me dices al terminar cómo fue.</p>
+      <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de fuerza de la semana ${S.pw}. Yo elijo qué toca cada día y voy subiendo la intensidad; tú solo me dices al terminar cómo fue.</p>
       <p class="small" style="margin-top:10px"><b>Lo que viene:</b> <span class="mut">${up}${upD}</span></p></div></div>
     <div class="sec"><h3>Tu semana</h3><div class="card"><div class="week">
-      <div class="days">${w.days.map((d,i)=>{const ty=d.plan||d.done?'f':i===6?'r':'c',ok=d.done||(ty==='c'&&(S.cardio||[]).includes(d.k));
-        return `<div class="d ${ok?'ok':''} ${d.today?'today':''} ${!ok&&i>ti&&ty!=='r'?'next':''}"><i>${wi(ok?'ok':ty)}</i>${'LMXJVSD'[i]}</div>`}).join('')}</div>
-      <div class="goal"><b class="num">${w.count}/${goalN()}</b>fuerza<small>${w.days.filter(d=>(S.cardio||[]).includes(d.k)).length} cardio</small></div></div>
-      <div style="margin-top:14px">${sch.map(([i,n,t,y])=>`<div class="hist"><span style="display:inline-flex;align-items:center;gap:8px"><span class="${y==='f'?'':'mut'}" style="display:inline-flex;width:16px">${wi(y==='f'?'f':y==='c'?'c':'r').replace('<svg','<svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"')}</span><span><b>${DAY3[i]}</b> <span class="${y==='f'?'':'mut'}">· ${n}</span></span></span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
-      <div class="wleg"><span>${wi('f')}Fuerza</span><span>${wi('c')}Cardio y abdomen · ${kEst} min</span><span>${wi('r')}Descanso</span><span style="color:var(--ac)">${wi('ok')}Hecho</span></div>
-      <p class="small mut" style="margin-top:10px">Lo que toca cada día lo decido yo. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}.</p></div></div>
-    ${ck?'':`<div class="sec"><h3>Si hoy no caminas</h3><button class="row" data-act="cardio">${stage('jacks',false,'thumb')}<div class="t"><b>Cardio y abdomen · ${kEst} min</b><span>Polichinelas, trote y abdominales. Cuenta como tu caminata del día.</span></div><div class="q num">${cardioToday()?'✓':'—'}<small>hoy</small></div></button></div>`}
-    <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Muchas horas sentado apagan el cuerpo. Levántate y hazla 2 o 3 veces en tu jornada.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
+      <div class="days">${w.days.map((d,i)=>{const ty=d.plan||d.done?'f':cp[i]||(S.cardio||[]).includes(d.k)?'c':i===6?'r':'a',ok=d.done||(ty==='c'&&(S.cardio||[]).includes(d.k));
+        return `<div class="d ${ok?'ok':''} ${d.today?'today':''} ${!ok&&i>ti&&(ty==='f'||ty==='c')?'next':''}"><i>${wi(ok?'ok':ty)}</i>${'LMXJVSD'[i]}</div>`}).join('')}</div>
+      <div class="goal"><b class="num">${w.count}/${goalN()}</b>fuerza<small>${cDone>=cGoal?'cardio ✓':`${cDone}/${cGoal} cardio${kOpt()?' (opc.)':''}`}</small></div></div>
+      <div style="margin-top:14px">${sch.map(([i,n,t,y])=>`<div class="hist"><span style="display:inline-flex;align-items:center;gap:8px"><span class="${y==='f'?'':'mut'}" style="display:inline-flex;width:16px">${wi(y).replace('<svg','<svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"')}</span><span><b>${DAY3[i]}</b> <span class="${y==='f'?'':'mut'}">· ${n}</span></span></span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
+      <div class="wleg"><span>${wi('f')}Fuerza</span><span>${wi('c')}Cardio suave · ${kEst} min</span><span>${wi('a')}Libre (pausas)</span><span>${wi('r')}Descanso</span><span style="color:var(--ac)">${wi('ok')}Hecho</span></div>
+      <p class="small mut" style="margin-top:10px">Cada semana tiene al menos 2 días libres y el cardio es suave, para que el cuerpo se recupere. El abdomen va dentro de la fuerza, 2 o 3 veces por semana. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}.</p></div></div>
+    <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Todos los días, también los libres. Levántate y hazla 2 o 3 veces en tu jornada: no es entreno, es no pasar el día sentado.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
   </div><div>
-    ${off?'':`<div class="sec"><h3>${ck?'Tu cardio de hoy · lo que vas a hacer':'Tu sesión de fuerza · lo que vas a hacer'}</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
+    ${off?'':ck?`<div class="sec"><h3>Tu cardio de hoy · sin parar, a ritmo de poder hablar</h3><div class="rows">${grp.map(([id,t])=>`<button class="row" data-act="ex" data-v="${id}">${stage(id,false,'thumb')}<div class="t"><b>${EX[id].name}${id==='jacks'&&S.pw<=8?' sin salto':''}</b><span>${id==='marcha'?'Para calentar, entre bloques y para terminar':EX[id].m}</span></div><div class="q num">${t>=60?Math.round(t/60)+' min':t+' s'}<small>en total</small></div></button>`).join('')}</div>
+    <p class="small mut" style="margin:14px 4px 0">Va encadenado: la app te pasa de un movimiento al siguiente. Intensidad: puedes hablar con frases cortas, pero no cantar.</p></div>`:`<div class="sec"><h3>Tu sesión de fuerza · lo que vas a hacer</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
     <p class="small mut" style="margin:14px 4px 0">Termina cada serie pudiendo hacer 2 más. Dolor punzante en hombro, rodilla o espalda: para y salta ese ejercicio.</p></div>`}
   </div></div>`;
 }
@@ -732,7 +743,7 @@ function vPerfil(){
   const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${S[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   return `<div class="head"><div><div class="eyebrow">Tu plan</div><h1>Perfil</h1></div></div>
   <div class="two-col"><div><div class="card note" style="margin-bottom:14px"><p><b>Tu entrenador decide</b> la rutina de cada día, los ejercicios y cuándo subir la intensidad. También los días y el ritmo. Tú solo eliges si entrenas por la mañana o por la noche.</p></div><div class="card">
-    <div class="set"><label>Tus días de entreno</label><div class="seg" style="pointer-events:none">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" tabindex="-1" aria-label="${DAYN[i]}">${l}</button>`).join('')}</div><p>Los pongo yo: <b>${tDays()} días, ${REC[tDays()]}</b>. ${tDays()===3?'Las 4 primeras semanas son 3 días con descanso entre medias: es lo que tu cuerpo necesita para recuperarse y lo que se sostiene con tu jornada. En la semana 5 sumamos el viernes.':tDays()===4?'En la fase Base son 4 días: es el volumen que hace falta para que se note el cambio. Cuando abras la fase Forja pasamos a 5.':'En la fase Forja son 5 días, con el miércoles y el domingo de descanso. La semana se cierra con 4 sesiones; la quinta suma.'} El domingo se descansa.</p></div>
+    <div class="set"><label>Tu semana tipo</label><div class="seg" style="pointer-events:none">${'LMXJVSD'.split('').map((l,i)=>`<button class="${plan()[i]?'on':''}" tabindex="-1" aria-label="${DAYN[i]}" style="${!plan()[i]&&cplan()[i]?'box-shadow:inset 0 0 0 1px var(--ac);color:var(--ac)':''}">${l}</button>`).join('')}</div><p>Los pongo yo. Ahora: <b>fuerza ${REC[phaseKey()]}</b> y <b>cardio suave ${cplan().map((v,i)=>v?DAYN[i]:null).filter(Boolean).join(' y ')}</b>${kOpt()?' (opcional estas dos semanas)':''}. Los demás días, libres: solo pausas activas. El domingo, descanso total.</p><p style="margin-top:8px">Cómo avanza: semanas 1–4, 3 días de fuerza y 1–2 de cardio · semanas 5–8, 4 de fuerza y 1 de cardio · semanas 9–12, 4 de fuerza y 1 de cardio más largo. Siempre quedan al menos 2 días libres a la semana: el músculo crece cuando descansa.</p></div>
     <div class="set"><label>Horario</label>${seg('when',[['am','Mañana'],['pm','Noche']])}<p>${S.when==='am'?'Recomendado si trabajas de 8:30 hasta la noche: la mañana es el único rato que el trabajo no te quita. Levántate a las 6:45, entrena y a la ducha.':'Funciona si entrenas nada más llegar, antes de cenar o sentarte. Si llegas agotado y lo saltas, pásate a la mañana.'}</p></div>
     <div class="set" style="margin:0"><label>Sonido</label>${seg('sound',[[true,'Activado'],[false,'Silencio']])}<p>Pitidos al acabar cada serie y cada descanso. El descanso lo marca el plan: ahora ${cfg(S.pw).rest} segundos.</p></div>
   </div>
@@ -740,10 +751,10 @@ function vPerfil(){
   <div class="sec"><h3>Instalar en tu iPhone</h3><div class="card note"><p>Abre esta página en <b>Safari</b>, toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba; a veces está dentro de <b>···</b>) y elige <b>«Agregar a Inicio»</b> o «Añadir a pantalla de inicio». Queda con su icono, a pantalla completa y funciona sin internet. Instálala primero y configúrala después: los datos se guardan solo en la app instalada. Con el iPhone en silencio, los pitidos no suenan.</p></div></div>
   </div><div>
   <div class="sec"><h3>Lo que de verdad cambia el cuerpo</h3><div class="card note"><ul style="margin:0">
-    <li><b>La barriga.</b> Los abdominales la ponen firme, pero la grasa de encima baja con el cardio, la fuerza y la comida. Por eso el plan mezcla las tres cosas y hay abdomen en casi todas las sesiones.</li>
+    <li><b>La barriga.</b> Los abdominales la ponen firme, pero no queman la grasa de encima: esa baja con la comida, el cardio y la fuerza de todo el cuerpo. Por eso el abdomen va 2 o 3 veces por semana dentro de la fuerza, y no todos los días.</li>
     <li><b>La grasa no se quita por zonas.</b> El pecho baja cuando baja la grasa total; las flexiones ponen músculo debajo para que quede firme y plano.</li>
-    <li><b>La comida manda.</b> Quita bebidas azucaradas y picoteo de escritorio, y pon proteína (huevo, pollo, pescado, menestras) en cada comida.</li>
-    <li><b>Muévete a diario.</b> Si no logras caminar 30 minutos, haz el cardio en casa de los días sin fuerza: son unos 10 minutos y cuenta igual.</li>
+    <li><b>La comida manda.</b> Come unas 300–500 kcal menos de lo que gastas, sin dietas extremas. Quita bebidas azucaradas y picoteo de escritorio, y pon proteína en cada comida (huevo, pollo, pescado, menestras): unos 130 g al día para tu peso.</li>
+    <li><b>Muévete a diario, sin entrenar a diario.</b> Las pausas activas y cualquier paseo cuentan. Si un día caminas 20–30 minutos, ese día vale como cardio.</li>
     <li><b>Duerme 7 horas.</b> El músculo se construye descansando.</li>
     <li><b>Ritmo realista:</b> medio kilo por semana. En 8–12 semanas se nota en la ropa.</li>
   </ul></div>
@@ -769,7 +780,7 @@ let OB={level:1,days:3,when:'am'};
 function renderOb(){$('#onboard').innerHTML=`<div class="ob"><div class="logo">FORJA</div><h1>Entrena en casa.<br>Sin máquinas.</h1>
   <p class="mut">Solo necesitas una silla firme, una pared, una mesa, una mochila con libros y dos botellas de agua. Entre 15 y 30 minutos por sesión.</p>
   ${navigator.standalone?'':'<p class="small mut" style="margin-top:10px">¿En iPhone? Primero toca <b>Compartir</b> y «Agregar a Inicio», y abre Forja desde su icono: lo que configures aquí en Safari no pasa a la app.</p>'}
-  <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo: empiezas con <b>3 días, lunes, miércoles y sábado</b>. En la semana 5 sumamos el viernes y en la fase final llegamos a 5 días. El domingo se descansa. El ritmo también lo llevo yo: empiezas en la semana 1 y subo cuando tu cuerpo esté listo.</p></div></div>
+  <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo. Empiezas con <b>3 días de fuerza: lunes, miércoles y sábado</b>, y un cardio suave el martes, opcional las dos primeras semanas. Los demás días, solo pausas activas, y el domingo descanso total. Voy sumando días e intensidad según avances. Tú solo eliges la hora.</p></div></div>
   <div class="sec"><h3>¿A qué hora?</h3><div class="opt">${[['am','Por la mañana · recomendado','Si trabajas de 8:30 hasta la noche: a las 6:45, antes de salir'],['pm','Por la noche','Al llegar a casa, antes de cenar']].map(([v,t,d])=>`<button class="${OB.when===v?'on':''}" data-act="ob" data-k="when" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>
   <div class="sec"><h3>Tu peso actual (opcional)</h3><div class="field"><input id="obKg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="kg" aria-label="Peso actual en kilos"></div></div>
   <div class="sec"><button class="btn pri xl" data-act="obGo" style="width:100%">Crear mi plan</button>
@@ -783,7 +794,7 @@ function ask(title,text,yes,fn){modalYes=fn;$('#modal').innerHTML=`<div class="c
 let P=null,tick=null,wake=null,actx=null;
 function beep(f=880,d=.12){if(!S.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state!=='running')actx.resume();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.18,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.start();o.stop(actx.currentTime+d)}catch(e){}}
 async function lock(on){try{if(on&&'wakeLock'in navigator)wake=await navigator.wakeLock.request('screen');else if(wake){await wake.release();wake=null}}catch(e){}}
-function startWorkout(k=curKey()){history.pushState({ov:1},'');checkGap();try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}P={k,rest:k==='P'?10:k==='K'?30:cfg(S.pw).rest,items:routine(k),i:0,set:1,phase:'',t0:Date.now(),end:0,left:0,paused:false,lastSec:-1};
+function startWorkout(k=curKey()){history.pushState({ov:1},'');checkGap();try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}P={k,rest:k==='P'?10:k==='K'?5:cfg(S.pw).rest,items:routine(k),i:0,set:1,phase:'',t0:Date.now(),end:0,left:0,paused:false,lastSec:-1};
   $('#player').classList.add('on');lock(true);enter(EX[P.items[0][0]].timed?'ready':'work');clearInterval(tick);tick=setInterval(onTick,200)}
 function enter(ph,secs){P.lockUntil=Date.now()+350;P.phase=ph;P.paused=false;P.lastSec=-1;const it=P.items[P.i];
   if(ph==='ready')secs=5; if(ph==='work'&&EX[it[0]].timed)secs=it[2];
@@ -815,8 +826,8 @@ function applyRate(rate,silent){const s=S.sessions[S.sessions.length-1];s.rate=r
 function renderDone(){const brk=P.k==='P',cd=P.k==='K',w=weekInfo();
   $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr auto;grid-template-columns:1fr"><div class="done-hero" style="align-self:center"><div class="ring"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
     <div class="pinfo"><div class="ph">${brk?'Pausa hecha':cd?'Cardio hecho':'Entreno completado'}</div></div><h1 style="margin:8px 0 22px">${RT[P.k].name}</h1>
-    <div class="stats" style="max-width:420px;margin:0 auto"><div class="card stat"><b class="num">${P.dur}</b><span>minutos</span></div><div class="card stat"><b class="num">${P.sets}</b><span>series</span></div><div class="card stat"><b class="num">${brk?breaksToday():w.count+'/'+goalN()}</b><span>${brk?'pausas hoy':'esta semana'}</span></div></div>
-    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, cardio en casa.`}</p></div>
+    <div class="stats" style="max-width:420px;margin:0 auto"><div class="card stat"><b class="num">${P.dur}</b><span>minutos</span></div><div class="card stat"><b class="num">${P.sets}</b><span>${cd?'bloques':'series'}</span></div><div class="card stat"><b class="num">${brk?breaksToday():w.count+'/'+goalN()}</b><span>${brk?'pausas hoy':'esta semana'}</span></div></div>
+    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, solo pausas activas.`}</p></div>
     <button class="btn pri xl" data-act="closePlayer">Listo</button></div>`}
 function renderPlayer(){
   const it=P.items[P.i],e=EX[it[0]],total=P.items.reduce((t,i)=>t+i[1],0),done=P.items.slice(0,P.i).reduce((t,i)=>t+i[1],0)+P.set-1;
