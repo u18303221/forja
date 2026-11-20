@@ -828,7 +828,7 @@ function renderPlayer(){
     <div class="pmid">${stage(it[0],true)}${info}</div>
     <div class="side">${info}<div class="pact">${act}</div></div></div>`;
   mountAnims()}
-function closePlayer(){clearInterval(tick);lock(false);if(P&&P.sub==='rate')applyRate('B',true);else if(P&&P.sub==='gate'){closeWeek('adv',false);save()}P=null;$('#player').classList.remove('on');$('#player').innerHTML='';render()}
+function closePlayer(){clearInterval(tick);lock(false);if(P&&P.sub==='rate')applyRate('B',true);else if(P&&P.sub==='gate'){closeWeek('adv',false);save()}P=null;$('#player').classList.remove('on');$('#player').innerHTML='';if(UPD)return location.reload();render()}
 
 /* ================= ANIMACIÓN ================= */
 let anims=[];const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -896,7 +896,14 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 function boot(){const ls=S.sessions[S.sessions.length-1];if(S.setup&&ls&&ls.rate===null)applyRate('B',true);if(S.setup)checkGap();if(!S.setup){OB={level:1,days:3,when:'am'};renderOb();$('#onboard').classList.add('on')}render()}
 authReturn().then(()=>{if(HANDOFF)return handoff(HANDOFF);boot();sync()});
 addEventListener('hashchange',()=>{if(/access_token=|error=/.test(location.hash))location.reload()});
-if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+/* actualización automática: busca versión nueva al volver a la app y recarga sola (nunca a mitad de un entreno) */
+let SWREG=null,UPD=false;
+if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+  const had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{SWREG=r}).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!had)return;if(P&&P.phase!=='done')UPD=true;else location.reload()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&SWREG&&navigator.onLine)SWREG.update().catch(()=>{})});
+}
 </script>
 </body>
 </html>
