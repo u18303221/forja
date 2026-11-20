@@ -332,7 +332,7 @@ pike:{name:'Flexión en pica',g:'hombros',m:'Hombros · tríceps',hl:['shoulders
 press:{name:'Press de hombro con mochila',g:'hombros',m:'Hombros · tríceps',hl:['shoulders','arms'],props:{pack:-3},
   a:{...STAND,hNp:[-18,21]},b:{...STAND,hNp:[-86,42]},
   steps:['De pie, mochila cargada (libros o botellas) a la altura del pecho.','Empújala recta hacia arriba hasta estirar los brazos.','Baja controlando hasta el pecho.'],
-  tip:'Empieza con 4–6 kg y sube cuando 12 repeticiones salgan fáciles.',bad:'Arquear la espalda; aprieta glúteos y abdomen.'},
+  tip:'Yo te digo cuánto peso poner y cuándo subirlo.',bad:'Arquear la espalda; aprieta glúteos y abdomen.'},
 curl:{name:'Curl de bíceps con botellas',g:'brazos',m:'Bíceps · antebrazos',hl:['arms'],props:{bottle:1},
   a:{...STAND,hNp:[80,47]},b:{...STAND,hNp:[-8,17]},
   steps:['De pie, una botella grande de agua en cada mano (o la mochila sujeta con las dos manos), brazos estirados.','Sube doblando los codos, sin separarlos del cuerpo.','Baja en 3 segundos.'],
@@ -467,8 +467,8 @@ const CYCLE=['A','B','C','D'];
 {const x=[['sentadilla',1,10],['flex_pared',1,10],['talones',1,15]];RT.P={name:'Pausa activa',focus:'Trabajo',desc:'',lv:{1:x,2:x,3:x}}}
 RT.K={name:'Cardio suave',focus:'Cardio',desc:''};
 const KMIN=[0,15,15,20,20,20,25,25,25,25,30,30,30];
-function kRoutine(w=S.pw){const hold=S.hold&&w>=9,T=hold?25:KMIN[w],out=[['marcha',1,180]];
-  if(w>=9&&!hold){const n=w===9?6:8,h=w===9?30:40,F=['escalador','trote','jacks'];out.push(['marcha',1,420]);
+function kRoutine(w=S.pw){const hold=S.hold&&w>=9,adj=S.kAdj||0,T=Math.max(10,Math.min(35,(hold?25:KMIN[w])+adj)),out=[['marcha',1,180]];
+  if(w>=9&&!hold){const n=Math.max(4,Math.min(10,(w===9?6:8)+adj/5*2)),h=w===9?30:40,F=['escalador','trote','jacks'];out.push(['marcha',1,420]);
     for(let i=0;i<n;i++){out.push([F[i%3],1,h]);out.push(['marcha',1,60])}}
   else{const cyc=w>=5?[['jacks',120],['escalador',40],['marcha',120]]:[['jacks',120],['marcha',120]];let rem=T*60-300,i=0;
     while(rem>=30){const [id,t]=cyc[i++%cyc.length],v=rem-t<30?rem:Math.min(t,rem);out.push([id,1,v]);rem-=v}}
@@ -508,6 +508,20 @@ function modifier(week,items,i,bonus=0,ease=false){
 }
 const SUB={plancha_toque:['plancha',30],bicicleta:['crunch',10],crunch_inv:['crunch',10],flex_diam:['flex',8],peso_muerto:['puente',15],fondos:['press',12],pike:['press',12],flex_decl:['flex_incl',10],flex:['flex_rod',8],flex_rod:['flex_incl',10],zancada:['puente',15],wallsit:['puente',15],elev_piernas:['crunch',10],superman:['birddog',6],escalador:['marcha',40]};
 const subOf=id=>{while(S.swap[id]&&SUB[id])id=SUB[id][0];return id};
+/* carga: mochila en kg (1 L de agua = 1 kg) y botellas en litros */
+const LOADED={press:['m',4],press_suelo:['m',6],remo:['m',6],peso_muerto:['m',8],curl:['b',1.5],elev_front:['b',1],patada:['b',1]};
+const BSTEPS=[0.5,1,1.5,2,2.5],PMAX=15;
+const loadOf=id=>(S.load&&S.load[id]!=null)?S.load[id]:LOADED[id][1];
+const fk=n=>String(n).replace('.',',');
+const loadTxt=id=>LOADED[id][0]==='m'?`Mochila ${fk(loadOf(id))} kg`:`Botellas de ${fk(loadOf(id))} L`;
+const loadHow=id=>LOADED[id][0]==='m'?`Llénala con botellas de agua o libros: ${fk(loadOf(id))} botellas de 1 litro pesan ${fk(loadOf(id))} kg. Para comprobarlo, súbete a la balanza con la mochila y sin ella: la diferencia es lo que pesa.`:`Una botella de agua en cada mano, de ${fk(loadOf(id))} litros cada una. Si no tienes de ese tamaño, llénalas de arena: pesan más.`;
+function raiseLoad(id){const [t]=LOADED[id],c=loadOf(id);let n=c;
+  if(t==='m')n=Math.min(PMAX,c+1);else{const i=BSTEPS.findIndex(x=>x>c);n=i<0?c:BSTEPS[i]}
+  if(n===c)return false;S.load={...S.load,[id]:n};return true}
+function loadProgress(ids,rate){const up=[];S.lc=S.lc||{};
+  for(const id of ids){if(!LOADED[id])continue;let v=(S.lc[id]||0)+(rate==='F'?2:rate==='B'?1:-99);if(v<0)v=0;
+    if(v>=3){v=0;if(raiseLoad(id))up.push(id)}S.lc[id]=v}
+  return up}
 const pwk=w=>(S.hold&&w>=9)?4:((w-1)%4)+1;
 function routine(k,w=S.pw,n=pwk(w)){
   if(k==='P')return RT.P.lv[1];
@@ -569,7 +583,7 @@ function checkGap(){const l=S.sessions[S.sessions.length-1];if(!l||S.gapFor===l.
   S.note=`Llevabas ${g} días sin entrenar. ${S.pw<from?`Bajamos a la semana ${S.pw}`:`Retomamos en la semana ${S.pw}`} para volver sin lesiones. Se recupera rápido.`;save()}
 
 const KEY='forja.v1';
-const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[]};
+const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[],load:{},lc:{},kAdj:0};
 const fresh=()=>JSON.parse(JSON.stringify(DEF));
 let S=load();
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}')||{},t={...fresh(),...o};if(o.setup&&o.pw==null&&o.level)t.pw={1:1,2:5,3:9}[o.level]||1;delete t.level;delete t.rest;return t}catch(e){return fresh()}}
@@ -675,7 +689,7 @@ function vHoy(){
   const restTxt=ti===6?'Domingo de descanso total: el músculo crece hoy.':cardioToday()?'Cardio hecho. Ahora toca recuperar.':'Hoy es día libre: el cuerpo se recupera y así rinde más mañana.';
   const H={go:`Hoy toca<br>${r.name.toLowerCase()}`,done:'Hecho<br>por hoy',rest:ti===6?'Hoy<br>descansas':'Hoy<br>día libre',cardio:`Hoy toca<br>cardio suave${kOpt()?' <span style="font-size:.5em;color:var(--mut)">· opcional</span>':''}`,catch:'Recupera<br>tu sesión'}[st];
   const sub={go:`Tu hora: ${WHEN[S.when][1]}. Son ${est} minutos.`,done:`Buen trabajo. Vuelves ${nextDay()}: ${nxt}.`,
-    cardio:`${est} minutos moviéndote sin parar, sin saltos ni abdominales: es tu caminata, pero en casa. ${kOpt()?'Estas dos primeras semanas es opcional: si hoy no puedes, no pasa nada. ':''}Si sales a caminar 20–30 minutos, cuenta igual.`,
+    cardio:`${est} minutos moviéndote sin parar, sin saltos ni abdominales: es tu caminata, pero en casa. ${kOpt()?'Estas dos primeras semanas es opcional: si hoy no puedes, no pasa nada. ':''}${S.kAdj?`Ajustado a cómo te fue el último: ${S.kAdj>0?'5 minutos más':'5 minutos menos'} de lo previsto. `:''}Si sales a caminar 20–30 minutos, cuenta igual.`,
     rest:`${restTxt} Vuelves ${nextDay()}: ${nxt}.`,catch:`Te quedó una sesión pendiente esta semana. Son ${est} minutos.`}[st];
   const cta={go:'Empezar entreno',catch:'Empezar entreno',cardio:'Empezar cardio',done:''}[st],pri=st==='go'||st==='catch'||ck;
   const coach=S.note?`<div class="card banner"><p><b>Tu entrenador:</b> ${S.note}</p><button class="btn sm" data-act="noteOk">Vale</button></div>`:'';
@@ -708,7 +722,7 @@ function vHoy(){
     <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Todos los días, también los libres. Levántate y hazla 2 o 3 veces en tu jornada: no es entreno, es no pasar el día sentado.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
   </div><div>
     ${off?'':ck?`<div class="sec"><h3>Tu cardio de hoy · sin parar, a ritmo de poder hablar</h3><div class="rows">${grp.map(([id,t])=>`<button class="row" data-act="ex" data-v="${id}">${stage(id,false,'thumb')}<div class="t"><b>${EX[id].name}${id==='jacks'&&S.pw<=8?' sin salto':''}</b><span>${id==='marcha'?'Para calentar, entre bloques y para terminar':EX[id].m}</span></div><div class="q num">${t>=60?Math.round(t/60)+' min':t+' s'}<small>en total</small></div></button>`).join('')}</div>
-    <p class="small mut" style="margin:14px 4px 0">Va encadenado: la app te pasa de un movimiento al siguiente. Intensidad: puedes hablar con frases cortas, pero no cantar.</p></div>`:`<div class="sec"><h3>Tu sesión de fuerza · lo que vas a hacer</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
+    <p class="small mut" style="margin:14px 4px 0">Va encadenado: la app te pasa de un movimiento al siguiente. Intensidad: puedes hablar con frases cortas, pero no cantar.</p></div>`:`<div class="sec"><h3>Tu sesión de fuerza · lo que vas a hacer</h3><div class="rows">${items.map(it=>`<button class="row" data-act="ex" data-v="${it[0]}">${stage(it[0],false,'thumb')}<div class="t"><b>${EX[it[0]].name}</b><span>${LOADED[it[0]]?`<b style="color:var(--ac)">${loadTxt(it[0])}</b> · `:''}${EX[it[0]].m}</span></div><div class="q num">${it[1]} × ${EX[it[0]].timed?it[2]+' s':it[2]}<small${dl[it[0]]?' style="color:var(--ac);font-weight:700"':''}>${dl[it[0]]||(EX[it[0]].side?'por lado':EX[it[0]].timed?'tiempo':'repeticiones')}</small></div></button>`).join('')}</div>
     <p class="small mut" style="margin:14px 4px 0">Termina cada serie pudiendo hacer 2 más. Dolor punzante en hombro, rodilla o espalda: para y salta ese ejercicio.</p></div>`}
   </div></div>`;
 }
@@ -770,6 +784,7 @@ function openEx(id){const e=EX[id];if(!$('#sheet').classList.contains('on'))hist
   <div style="margin:20px 0 6px"><span class="chip ac">${GROUPS.find(g=>g[0]===e.g)[1]}</span></div>
   <h1 style="font-size:32px">${e.name}</h1><p class="mut" style="margin-top:6px">Trabaja: ${e.m} <span style="color:var(--ac)">●</span> zona marcada en naranja</p>
   ${(()=>{const n=note(id);return n!==e.tip&&id!=='fondos'&&id!=='plancha'&&id!=='elev_piernas'?`<div class="sec card note"><p><b>Por ahora:</b> ${n}</p></div>`:''})()}
+  ${LOADED[id]?`<div class="sec card note"><p><b>Tu carga ahora: ${loadTxt(id)}.</b> ${loadHow(id)}</p><p class="small mut" style="margin-top:8px">La subo yo cuando las sesiones con este ejercicio te salen bien: «Fácil» una vez y «Bien» otra, o «Bien» tres veces. Si marcas «Muy duro», espero.</p></div>`:''}
   <div class="sec"><h3>Cómo se hace</h3><ol class="steps">${e.steps.map(s=>`<li><span>${s}</span></li>`).join('')}</ol></div>
   <div class="sec tipbox"><div class="good"><b>Clave</b>${e.tip}</div><div class="bad"><b>Error típico</b>${e.bad}</div></div>
   ${SUB[id]?`<div class="sec"><button class="btn sm ${S.swap[id]?'pri':''}" data-act="swap" data-v="${id}" style="width:100%">${S.swap[id]?`Sustituido por ${EX[subOf(id)].name.toLowerCase()} · Deshacer`:'Me molesta este ejercicio'}</button><p class="small mut" style="margin-top:8px">Si te duele una articulación (no es lo mismo que cansancio), lo cambio por ${EX[SUB[id][0]].name.toLowerCase()} en todas tus rutinas.${P&&P.phase!=='done'?' El cambio vale desde la próxima sesión; en esta, sáltalo.':''}</p></div>`:''}</div>`;
@@ -810,11 +825,18 @@ function onTick(){if(!P||!P.timed||P.paused||P.phase==='done')return;
   if(sec!==P.lastSec){P.lastSec=sec;if(sec<=3&&sec>0)beep(P.phase==='rest'?520:740,.07)}
   if(left<=0){if(P.phase==='ready'){beep(990,.2);enter('work')}else if(P.phase==='work')finishSet();else afterRest()}}
 function finish(){clearInterval(tick);lock(false);P.dur=Math.max(1,Math.round((Date.now()-P.t0)/60000));P.sets=P.items.reduce((t,i)=>t+i[1],0);P.phase='done';
-  if(P.k==='K'){const lim=dkey(new Date(Date.now()-60*864e5));S.cardio=(S.cardio||[]).filter(d=>d>=lim&&d!==dkey()).concat(dkey());save();return renderDone()}
+  if(P.k==='K'){const lim=dkey(new Date(Date.now()-60*864e5));S.cardio=(S.cardio||[]).filter(d=>d>=lim&&d!==dkey()).concat(dkey());save();P.sub='krate';
+    $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr;grid-template-columns:1fr"><div style="align-self:center;max-width:520px;width:100%;margin:0 auto"><div class="pinfo"><div class="ph">Última pregunta</div><h1 style="margin:8px 0 8px">¿Cómo fue el cardio?</h1><p class="mut" style="margin-bottom:22px">Con tu respuesta ajusto el próximo.</p></div>
+    <div class="opt">${[['F','Fácil','Podría haber seguido mucho más'],['B','Bien','Cansado, pero podía hablar'],['D','Muy duro','Me faltó el aire o tuve que parar']].map(([v,t,d])=>`<button data-act="krate" data-v="${v}" style="padding:18px"><b style="font-size:19px">${t}</b><span>${d}</span></button>`).join('')}</div></div></div>`;return}
   if(P.k==='P'){S.breaks=S.breaks.filter(d=>d===dkey()).concat(dkey());save();return renderDone()}
-  S.sessions.push({d:dkey(),r:P.k,lvl:lv(),pw:S.pw,dur:P.dur,sets:P.sets,rate:null});S.cycle=(CYCLE.indexOf(P.k)+1)%CYCLE.length;S.pick=null;S.note='';save();P.sub='rate';
+  S.sessions.push({d:dkey(),r:P.k,lvl:lv(),pw:S.pw,dur:P.dur,sets:P.sets,rate:null,ld:P.items.map(x=>x[0]).filter(id=>LOADED[id]&&!(P.skipped||[]).includes(id))});S.cycle=(CYCLE.indexOf(P.k)+1)%CYCLE.length;S.pick=null;S.note='';save();P.sub='rate';
   $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr;grid-template-columns:1fr"><div style="align-self:center;max-width:520px;width:100%;margin:0 auto"><div class="pinfo"><div class="ph">Última pregunta</div><h1 style="margin:8px 0 8px">¿Cómo estuvo?</h1><p class="mut" style="margin-bottom:22px">Con tu respuesta ajusto la próxima sesión.</p></div>
     <div class="opt">${[['F','Fácil','Me sobraron fuerzas en todas las series'],['B','Bien','Exigente, pero la terminé entera'],['D','Muy duro','No pude completar las series']].map(([v,t,d])=>`<button data-act="rate" data-v="${v}" style="padding:18px"><b style="font-size:19px">${t}</b><span>${d}</span></button>`).join('')}</div></div></div>`}
+function kRate(v){const a=S.kAdj||0;
+  if(v==='F'){S.kAdj=Math.min(5,a+5);P.kmsg=a>=5?'Ya vas 5 minutos por encima del plan. La intensidad sigue subiendo sola con las semanas.':'Te subo 5 minutos el próximo cardio.'}
+  else if(v==='D'){S.kAdj=Math.max(-5,a-5);P.kmsg='El próximo cardio será 5 minutos más corto. Ve a un ritmo en el que puedas hablar: no hace falta ahogarse para quemar grasa.'}
+  else P.kmsg='Ese es el ritmo justo. Seguimos según el plan.';
+  P.sub=null;save();renderDone()}
 function applyRate(rate,silent){const s=S.sessions[S.sessions.length-1];s.rate=rate;if(P)P.sub=null;
   if(S.sessions.filter(x=>x.d===s.d).length===1){S.ws.push(rate);S.ease=rate==='D';
     if(S.ws.length>=need()){const o=outcome();
@@ -822,12 +844,14 @@ function applyRate(rate,silent){const s=S.sessions[S.sessions.length-1];s.rate=r
         $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr;grid-template-columns:1fr"><div style="align-self:center;max-width:520px;width:100%;margin:0 auto"><div class="pinfo"><div class="ph">Test de flexiones</div><h1 style="margin:8px 0 10px">¿Te salen 10 clásicas?</h1><p class="mut" style="margin-bottom:22px">Hazlo descansado, no ahora: seguidas, cuerpo recto y bajando el pecho hasta casi el suelo. Con 10 abrimos la fase Forja. No llegar todavía es lo normal.</p></div>
         <div class="opt"><button data-act="gate" data-v="1" style="padding:18px"><b style="font-size:19px">Sí, 10 o más</b><span>Paso a flexiones clásicas</span></button><button data-act="gate" data-v="0" style="padding:18px"><b style="font-size:19px">Todavía no</b><span>Sigo sumando en Base y me lo preguntas la semana que viene</span></button></div></div></div>`;return}
       closeWeek(o,false)}}
+  const up=loadProgress(s.ld||[],rate);
+  if(up.length)S.note=(S.note?S.note+' ':'')+'Sube la carga: '+up.map(id=>`${EX[id].name.toLowerCase()}, ${loadTxt(id).replace(/^./,c=>c.toLowerCase())}`).join('; ')+'. Las repeticiones siguen igual: con más peso, cuestan más.';
   save();if(!silent)renderDone()}
 function renderDone(){const brk=P.k==='P',cd=P.k==='K',w=weekInfo();
   $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr auto;grid-template-columns:1fr"><div class="done-hero" style="align-self:center"><div class="ring"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
     <div class="pinfo"><div class="ph">${brk?'Pausa hecha':cd?'Cardio hecho':'Entreno completado'}</div></div><h1 style="margin:8px 0 22px">${RT[P.k].name}</h1>
     <div class="stats" style="max-width:420px;margin:0 auto"><div class="card stat"><b class="num">${P.dur}</b><span>minutos</span></div><div class="card stat"><b class="num">${P.sets}</b><span>${cd?'bloques':'series'}</span></div><div class="card stat"><b class="num">${brk?breaksToday():w.count+'/'+goalN()}</b><span>${brk?'pausas hoy':'esta semana'}</span></div></div>
-    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, solo pausas activas.`}</p></div>
+    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`${P.kmsg?`<b style="color:var(--tx)">${P.kmsg}</b><br><br>`:''}Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, solo pausas activas.`}</p></div>
     <button class="btn pri xl" data-act="closePlayer">Listo</button></div>`}
 function renderPlayer(){
   const it=P.items[P.i],e=EX[it[0]],total=P.items.reduce((t,i)=>t+i[1],0),done=P.items.slice(0,P.i).reduce((t,i)=>t+i[1],0)+P.set-1;
@@ -836,7 +860,7 @@ function renderPlayer(){
   const label=rest?'Descanso':ready?'Prepárate':`Serie ${P.set} de ${it[1]}`;
   const big=rest?`<div class="big num ptime">${fmt(P.rest)}</div>`:ready?`<div class="big num ptime">5</div>`:e.timed?`<div class="big num ptime">${fmt(it[2])}</div>`:`<div class="big num">${it[2]}<small>${e.side?'por lado':'reps'}</small></div>`;
   const info=`<div class="pinfo ${rest?'rest':''}"><div class="ph">${label}</div><h2>${rest?'Siguiente: ':''}${e.name}</h2>${big}
-    <p class="mut">${rest?`Serie ${P.set} de ${it[1]} · ${qty(it)}`:note(it[0])}</p></div>`;
+    <p class="mut">${LOADED[it[0]]?`<b style="color:var(--ac)">${loadTxt(it[0])}</b> · `:''}${rest?`Serie ${P.set} de ${it[1]} · ${qty(it)}`:note(it[0])}</p></div>`;
   let act;
   if(rest)act=`<div class="two"><button class="btn xl" data-act="plus">+15 s</button><button class="btn pri xl" data-act="skipRest">Seguir</button></div>`;
   else if(e.timed)act=`<div class="two"><button class="btn xl" data-act="pause" id="pauseBtn">Pausa</button><button class="btn xl" data-act="doneSet">Saltar</button></div><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar ejercicio</button>`;
@@ -845,7 +869,7 @@ function renderPlayer(){
     <div class="pmid">${stage(it[0],true)}${info}</div>
     <div class="side">${info}<div class="pact">${act}</div></div></div>`;
   mountAnims()}
-function closePlayer(){clearInterval(tick);lock(false);if(P&&P.sub==='rate')applyRate('B',true);else if(P&&P.sub==='gate'){closeWeek('adv',false);save()}P=null;$('#player').classList.remove('on');$('#player').innerHTML='';if(UPD)return location.reload();render()}
+function closePlayer(){clearInterval(tick);lock(false);if(P&&P.sub==='krate')P.sub=null;if(P&&P.sub==='rate')applyRate('B',true);else if(P&&P.sub==='gate'){closeWeek('adv',false);save()}P=null;$('#player').classList.remove('on');$('#player').innerHTML='';if(UPD)return location.reload();render()}
 
 /* ================= ANIMACIÓN ================= */
 let anims=[];const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -871,14 +895,15 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
     case 'break':startWorkout('P');break;
     case 'cardio':startWorkout('K');break;
     case 'rate':applyRate(v,false);break;
-    case 'gate':closeWeek('adv',v==='1');P.sub=null;save();renderDone();break;
+    case 'krate':kRate(v);break;
+    case 'gate':{closeWeek('adv',v==='1');const s=S.sessions[S.sessions.length-1],up=loadProgress(s.ld||[],s.rate||'B');if(up.length)S.note+=' Sube la carga: '+up.map(id=>`${EX[id].name.toLowerCase()}, ${loadTxt(id).replace(/^./,c=>c.toLowerCase())}`).join('; ')+'.';P.sub=null;save();renderDone()}break;
     case 'noteOk':S.note='';save();render();break;
     case 'swap':if(S.swap[v])delete S.swap[v];else S.swap[v]=true;save();openEx(v);if(!P)render();break;
     case 'ob':OB[b.dataset.k]=cast(v);{const kg=$('#obKg').value;renderOb();$('#obKg').value=kg}break;
     case 'obGo':{const kg=parseFloat($('#obKg').value);S.pw=1;S.note='Empezamos de cero y a propósito suave. Hoy no se trata de sufrir: se trata de volver la próxima vez. Hazte hoy una foto y mídete la cintura: las compararás en la semana 12.';S.days=OB.days;S.when=OB.when;S.plan=null;S.since=dkey();S.setup=true;if(kg>=30&&kg<=250)S.weights.push({d:dkey(),kg:Math.round(kg*10)/10});save();$('#onboard').classList.remove('on');render()}break;
     case 'start':startWorkout();break;
     case 'doneSet':finishSet();break;
-    case 'skipEx':P.set=P.items[P.i][1];finishSet();break;
+    case 'skipEx':(P.skipped=P.skipped||[]).push(P.items[P.i][0]);P.set=P.items[P.i][1];finishSet();break;
     case 'skipRest':afterRest();break;
     case 'plus':P.end+=15000;onTick();break;
     case 'pause':if(P.paused){P.end=Date.now()+P.left;P.paused=false;b.textContent='Pausa'}else{P.left=P.end-Date.now();P.paused=true;b.textContent='Continuar'}break;
