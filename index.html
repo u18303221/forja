@@ -216,11 +216,12 @@ nav button.on svg{stroke:var(--ac)}
 <div class="ov" id="onboard"></div>
 <div class="modal" id="modal"></div>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="gVol" cx=".34" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></radialGradient></defs></svg>
 <script>
 'use strict';
 /* ================= FIGURA: esqueleto 2D con cinemática inversa ================= */
 const LEN={torso:46,ua:24,fa:24,th:32,sh:32,neck:17,head:9.5,foot:9}, FLOOR=140, RAD=Math.PI/180;
-const C={near:'#f1ede5',far:'#5d626a',hl:'#ff5a1f',hlFar:'#a8431c',bg:'#1a1d22',prop:'#343941',propHi:'#454b55'};
+const C={near:'#f1ede5',far:'#5d626a',hl:'#ff5a1f',hlFar:'#a8431c',bg:'#1a1d22',neck:'#cfcabf',prop:'#343941',propHi:'#454b55'};
 const pol=(p,a,d)=>[p[0]+d*Math.cos(a*RAD),p[1]+d*Math.sin(a*RAD)];
 function ik(R,T,a,b,s){
   const dx=T[0]-R[0],dy=T[1]-R[1],d=Math.hypot(dx,dy)||.001;
@@ -235,6 +236,13 @@ const f1=n=>Math.round(n*10)/10;
 const ln=(a,b,w,c)=>`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
 const ci=(p,r,c)=>`<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}" fill="${c}"/>`;
 
+/* segmento con volumen: cápsula afilada + sombra abajo-derecha + brillo arriba-izquierda */
+function limb(a,b,w1,w2,c,k=1){
+  const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.hypot(dx,dy)||.001;let nx=-dy/d,ny=dx/d;if(nx*.5+ny*.86<0){nx=-nx;ny=-ny}
+  const r1=w1/2,r2=w2/2,wm=(w1+w2)/2,P=(p,r)=>f1(p[0]+nx*r)+','+f1(p[1]+ny*r);
+  const L=(o,w,col,op)=>`<line x1="${f1(a[0]+nx*wm*o)}" y1="${f1(a[1]+ny*wm*o)}" x2="${f1(b[0]+nx*wm*o)}" y2="${f1(b[1]+ny*wm*o)}" stroke="${col}" stroke-opacity="${op}" stroke-width="${f1(wm*w)}" stroke-linecap="round"/>`;
+  return `<polygon points="${P(a,r1)} ${P(b,r2)} ${P(b,-r2)} ${P(a,-r1)}" fill="${c}"/>`+ci(a,r1,c)+ci(b,r2,c)+L(.2,.4,'#000',.22*k)+L(-.2,.2,'#fff',.3*k);
+}
 function fig(ex,u){
   const p=lerpPose(ex.a,ex.b,u,ex.seq), hl=ex.hl||[], has=k=>hl.includes(k);
   const eb=[].concat(ex.eb??1), kb=[].concat(ex.kb??-1);
@@ -254,26 +262,32 @@ function fig(ex,u){
     if(c.back) {const bx=c.back==='l'?c.x+3:c.x+c.w-3; s+=ln([bx,c.y],[bx,c.y-40],5,C.prop);}
     s+=`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="6" rx="3" fill="${C.propHi}"/>`;}
   const pack=(h)=>{const dy=pr.pack;return `<rect x="${f1(h[0]-10)}" y="${f1(h[1]+dy-12)}" width="20" height="24" rx="6" fill="${C.propHi}" stroke="${C.bg}" stroke-width="2"/><rect x="${f1(h[0]-5)}" y="${f1(h[1]+dy+1)}" width="10" height="6" rx="2" fill="${C.prop}"/>`};
+  // sombra en el suelo
+  {const xs=[hip[0],sho[0],head[0],fn[0],ff[0]],x0=Math.min(...xs),x1=Math.max(...xs);
+   s+=`<ellipse cx="${f1((x0+x1)/2)}" cy="${FLOOR+1.5}" rx="${f1((x1-x0)/2+12)}" ry="3.6" fill="#000" opacity=".3"/>`;}
+  const G=(p,r)=>`<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}" fill="url(#gVol)"/>`;
   // lado lejano
-  s+=ln(sho,eF,8,has('arms')||has('shoulders')?C.hlFar:C.far)+ln(eF,hf,7.5,C.far)+ci(hf,4.2,C.far);
-  s+=ln(hip,kF,9.5,has('thighs')?C.hlFar:C.far)+ln(kF,ff,8.5,has('calves')?C.hlFar:C.far)+ln(ff,pol(ff,toeF,LEN.foot),7,C.far);
+  s+=limb(sho,eF,9,7.5,has('arms')||has('shoulders')?C.hlFar:C.far,.5)+limb(eF,hf,7.5,6,C.far,.5)+ci(hf,4.2,C.far);
+  s+=limb(hip,kF,11,8.5,has('thighs')?C.hlFar:C.far,.5)+limb(kF,ff,8.5,6.5,has('calves')?C.hlFar:C.far,.5)+limb(ff,pol(ff,toeF,LEN.foot),7,5.5,C.far,.5);
   // tronco y cabeza
-  s+=ln(hip,sho,17,C.near);
-  const tp=f=>[hip[0]+(sho[0]-hip[0])*f,hip[1]+(sho[1]-hip[1])*f];
-  if(has('chest')||has('back')) s+=ln(tp(.56),tp(.98),17,C.hl);
-  if(has('abs')) s+=ln(tp(.04),tp(.46),17,C.hl);
-  s+=ci(head,LEN.head+2.2,C.bg)+ci(head,LEN.head,C.near);
+  const tp=f=>[hip[0]+(sho[0]-hip[0])*f,hip[1]+(sho[1]-hip[1])*f],tw=f=>15+5.5*f;
+  s+=ln(sho,head,7.5,C.neck);
+  s+=limb(hip,sho,tw(0),tw(1),C.near);
+  if(has('chest')||has('back')) s+=limb(tp(.56),tp(.98),tw(.56),tw(.98),C.hl);
+  if(has('abs')) s+=limb(tp(.04),tp(.46),tw(.04),tw(.46),C.hl);
+  s+=ci(head,LEN.head+2.2,C.bg)+ci(head,LEN.head,C.near)+G(head,LEN.head);
   // pierna cercana (con borde para separarla)
-  s+=ln(hip,kN,13.5,C.bg)+ln(kN,fn,12.5,C.bg);
-  s+=ln(fn,pol(fn,toeN,LEN.foot),7.5,C.near)+ln(kN,fn,8.5,has('calves')?C.hl:C.near)+ln(hip,kN,9.5,has('thighs')?C.hl:C.near);
-  if(has('glutes')) s+=ci(hip,9,C.hl);
+  const toeP=pol(fn,toeN,LEN.foot);
+  s+=ln(hip,kN,15,C.bg)+ln(kN,fn,12.5,C.bg);
+  s+=limb(fn,toeP,7.5,6,C.near)+limb(kN,fn,9,6.8,has('calves')?C.hl:C.near)+limb(hip,kN,11.5,9,has('thighs')?C.hl:C.near);
+  if(has('glutes')) s+=ci(hip,9,C.hl)+G(hip,9);
   // brazo cercano
   if(pr.pack!=null && pr.pack>0) s+=pack(hn);
-  s+=ln(sho,eN,12.5,C.bg)+ln(eN,hn,11.5,C.bg);
-  s+=ln(eN,hn,7.5,C.near)+ln(sho,eN,8.5,has('arms')?C.hl:C.near)+ci(hn,4.4,C.near);
-  if(has('shoulders')) s+=ci(sho,7.5,C.hl);
+  s+=ln(sho,eN,13.5,C.bg)+ln(eN,hn,11.5,C.bg);
+  s+=limb(eN,hn,7.8,6.2,C.near)+limb(sho,eN,9.5,7.8,has('arms')?C.hl:C.near)+ci(hn,4.4,C.near)+G(hn,4.4);
+  if(has('shoulders')) s+=ci(sho,7.5,C.hl)+G(sho,7.5);
   if(pr.pack!=null && pr.pack<=0) s+=pack(hn);
-  if(pr.bottle) s+=`<rect x="${f1(hn[0]-5.5)}" y="${f1(hn[1]-12)}" width="11" height="24" rx="4" fill="${C.propHi}" stroke="${C.bg}" stroke-width="2"/>`+ci(hn,3.2,C.near);
+  if(pr.bottle) s+=`<rect x="${f1(hn[0]-5.5)}" y="${f1(hn[1]-12)}" width="11" height="24" rx="4" fill="${C.propHi}" stroke="${C.bg}" stroke-width="2"/><rect x="${f1(hn[0]-3.6)}" y="${f1(hn[1]-9.5)}" width="2.2" height="19" rx="1.1" fill="#fff" opacity=".18"/>`+ci(hn,3.2,C.near);
   return s;
 }
 const svg=(id,anim)=>`<svg viewBox="0 -36 220 184" ${anim?`data-anim="${id}"`:''} role="img" aria-label="${EX[id].name}">${fig(EX[id],anim?0:(EX[id].tu??1))}</svg>`;
