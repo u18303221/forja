@@ -81,6 +81,8 @@ nav button.on svg{stroke:var(--ac)}
 .week .d.done i{background:var(--ac)}
 .week .d.plan i{background:var(--acbg);border-color:rgba(255,90,31,.55)}
 .week .d.done i{background:var(--ac);border-color:var(--ac)}
+.week .d.cardio i{border:1px dashed rgba(255,255,255,.28)}
+.week .d.cdone i{background:rgba(255,90,31,.32);border:1px dashed rgba(255,90,31,.7)}
 .week .d.today i{outline:2px solid var(--tx);outline-offset:2px}
 .week .d.today{color:var(--tx)}
 .week .goal{text-align:right;font-size:12px;color:var(--mut);line-height:1.25}
@@ -514,7 +516,13 @@ function delta(k){const out={};if(S.pw<2||S.rep>0)return out;const prev=new Map(
 function adds(w){if(w<2||w>12)return [];const u=x=>new Set(CYCLE.flatMap(k=>routine(k,x).map(i=>i[0]))),a=u(w-1);return [...u(w)].filter(id=>!a.has(id)).map(id=>EX[id].name.toLowerCase())}
 const DAY3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 function schedule(){const w=weekInfo(),ti=todayIdx(),by={};S.sessions.forEach(s=>by[s.d]=s.r);let j=0;
-  return w.days.map((d,i)=>d.done?[i,(RT[by[d.k]]||RT.A).name,'Hecho']:(!d.plan||i<ti)?null:[i,RT[CYCLE[(S.cycle+j++)%CYCLE.length]].name,i===ti?'Hoy':'']).filter(Boolean)}
+  const cd=new Set(S.cardio||[]);
+  return w.days.map((d,i)=>{
+    if(d.done)return [i,(RT[by[d.k]]||RT.A).name,'Hecho','f'];
+    if(d.plan)return i<ti?null:[i,RT[CYCLE[(S.cycle+j++)%CYCLE.length]].name,i===ti?'Hoy':'','f'];
+    if(i===6)return [i,'Descanso total',i===ti?'Hoy':'','r'];
+    if(cd.has(d.k))return [i,'Cardio y abdomen','Hecho','c'];
+    return i<ti?null:[i,'Cardio y abdomen',i===ti?'Hoy':'','c']}).filter(Boolean)}
 function note(id){const w=S.pw;
   if(id==='jacks'&&w<=4)return 'Estas semanas, sin salto: abre una pierna al lado y luego la otra mientras subes los brazos.';
   if(id==='trote'&&w<=4)return 'Estas semanas, sin saltar: marcha rápida llevando el talón atrás.';
@@ -676,10 +684,10 @@ function vHoy(){
       <p class="small mut" style="margin-top:6px">${ph[1]} Llevas ${S.ws.length} de ${need()} sesiones de la semana ${S.pw} del plan. Yo elijo la rutina de cada día y voy sumando ejercicios, series y repeticiones; tú solo me dices al terminar cómo fue.</p>
       <p class="small" style="margin-top:10px"><b>Lo que viene:</b> <span class="mut">${up}${upD}</span></p></div></div>
     <div class="sec"><h3>Tu semana</h3><div class="card"><div class="week">
-      <div class="days">${w.days.map((d,i)=>`<div class="d ${d.plan?'plan':''} ${d.done?'done':''} ${d.today?'today':''}"><i></i>${'LMXJVSD'[i]}</div>`).join('')}</div>
+      <div class="days">${w.days.map((d,i)=>`<div class="d ${d.plan?'plan':''} ${d.done?'done':''} ${!d.plan&&!d.done&&i<6?((S.cardio||[]).includes(d.k)?'cdone':'cardio'):''} ${d.today?'today':''}"><i></i>${'LMXJVSD'[i]}</div>`).join('')}</div>
       <div class="goal"><b class="num">${w.count}/${goalN()}</b>sesiones</div></div>
-      <div style="margin-top:14px">${sch.map(([i,n,t])=>`<div class="hist"><span><b>${DAY3[i]}</b> <span class="mut">· ${n}</span></span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
-      <p class="small mut" style="margin-top:12px">Lo que toca cada día lo decido yo. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}. Los demás días, ${kEst} minutos de cardio y abdomen en lugar de la caminata.</p></div></div>
+      <div style="margin-top:14px">${sch.map(([i,n,t,y])=>`<div class="hist"><span><b>${DAY3[i]}</b> <span class="${y==='f'?'':'mut'}">· ${n}</span>${y==='f'?' <span class="small mut">fuerza</span>':''}</span><span class="${t==='Hoy'?'':'mut'} small"${t==='Hoy'?' style="color:var(--ac);font-weight:700"':''}>${t}</span></div>`).join('')}</div>
+      <p class="small mut" style="margin-top:12px">Lo que toca cada día lo decido yo. Recuadro naranja: fuerza. Recuadro punteado: ${kEst} minutos de cardio y abdomen en lugar de la caminata. Domingo: descanso total. ${WHEN[S.when][0]}, ${WHEN[S.when][1]}.</p></div></div>
     ${ck?'':`<div class="sec"><h3>Si hoy no caminas</h3><button class="row" data-act="cardio">${stage('jacks',false,'thumb')}<div class="t"><b>Cardio y abdomen · ${kEst} min</b><span>Polichinelas, trote y abdominales. Cuenta como tu caminata del día.</span></div><div class="q num">${cardioToday()?'✓':'—'}<small>hoy</small></div></button></div>`}
     <div class="sec"><h3>En el trabajo</h3><button class="row" data-act="break">${stage('sentadilla',false,'thumb')}<div class="t"><b>Pausa activa · 2 min</b><span>Muchas horas sentado apagan el cuerpo. Levántate y hazla 2 o 3 veces en tu jornada.</span></div><div class="q num">${breaksToday()}<small>hoy</small></div></button></div>
   </div><div>
