@@ -536,7 +536,7 @@ function routine(k,w=S.pw,n=pwk(w)){
   base=base.flatMap(it=>{let id=it[0],v=it[2];while(S.swap[id]&&SUB[id]){v=SUB[id][1];id=SUB[id][0]}if(id===it[0])return [it];if(ids.has(id)){extra[id]=(extra[id]||0)+1;return []}ids.add(id);return [[id,it[1],v]]});
   base.forEach((x,i)=>{if(i>0&&extra[x[0]])x[1]=Math.min(4,x[1]+extra[x[0]])});
   if(n<4&&base.length<4)return routine(k,w,4);
-  return base.map((_,i)=>modifier(w,base,i,now?S.bonus:0,now&&S.ease));
+  return base.map((_,i)=>modifier(w,base,i,(now?S.bonus:0)+(now&&!EX[base[i][0]].timed?((S.xb||{})[base[i][0]]||0):0),now&&S.ease));
 }
 /* qué sube respecto a la semana anterior del plan (solo aumentos) */
 function delta(k){const out={};if(S.pw<2||S.rep>0)return out;const prev=new Map(routine(k,S.pw-1).map(x=>[x[0],x]));
@@ -571,14 +571,14 @@ function outcome(){const n=S.ws.length,D=S.ws.filter(x=>x==='D').length,half=Mat
 function closeWeek(o,pass){
   const n=S.ws.length,F=S.ws.filter(x=>x==='F').length,from=S.pw;let m;
   if(o==='back'){m=from===1?'Fue demasiado, y no pasa nada. Seguimos en la semana 1 con menos repeticiones: sigue con la mesa y apoya las rodillas en la plancha.':'Fue demasiado. Volvemos una semana atrás y subimos con más calma.';
-    S.pw=Math.max(1,from-1);S.rep=0;S.bonus=0;if(S.pw<9)S.hold=false}
+    S.pw=Math.max(1,from-1);S.rep=0;S.bonus=0;S.xb={};if(S.pw<9)S.hold=false}
   else if(o==='repeat'){S.rep++;S.bonus=0;m='Esta semana se repite. No es un castigo: el cuerpo pide una vuelta más antes de subir.'}
   else{let next=from+1,easy=F===n;const b0=S.bonus;if(easy)S.bonus=Math.min(2,S.bonus+1);
     if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Tus días cambian: fuerza lunes, martes, jueves y sábado, y cardio el miércoles.'}
       else m='Seguimos en Base con un poco más cada semana. No es ir atrás: es llegar fuerte a la flexión clásica. Te lo vuelvo a preguntar la semana que viene.'}
     let jump=false;if(easy&&!gateDue()&&next===from+1&&from!==4){const cap=from<8?8:12;if(from+2<=cap){next=from+2;jump=true;S.bonus=b0}}
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
-    S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
+    S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;if(next===5||next===9||next<from)S.xb={};
     if(jump)m=`Toda la semana te resultó fácil: me salto una. Pasas a la semana ${next}.${next===5?' Ahora son 4 días de fuerza (se suma el viernes).':''}`;
     if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento. Y pasamos a 4 días de fuerza: se suma el viernes, con un cardio el martes.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
     if(next===from+1||jump){const u=x=>new Set(CYCLE.flatMap(k=>routine(k,x).map(i=>i[0]))),a=u(from),ad=[...u(S.pw)].filter(id=>!a.has(id)).map(id=>EX[id].name.toLowerCase());
@@ -592,7 +592,7 @@ function checkGap(){const l=S.sessions[S.sessions.length-1];if(!l||S.gapFor===l.
   S.note=`Llevabas ${g} días sin entrenar. ${S.pw<from?`Bajamos a la semana ${S.pw}`:`Retomamos en la semana ${S.pw}`} para volver sin lesiones. Se recupera rápido.`;save()}
 
 const KEY='forja.v1';
-const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[],load:{},lc:{},kAdj:0,waist:[]};
+const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[],load:{},lc:{},kAdj:0,waist:[],xb:{}};
 const fresh=()=>JSON.parse(JSON.stringify(DEF));
 let S=load();
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}')||{},t={...fresh(),...o};if(o.setup&&o.pw==null&&o.level)t.pw={1:1,2:5,3:9}[o.level]||1;delete t.level;delete t.rest;return t}catch(e){return fresh()}}
@@ -830,7 +830,7 @@ function beep(f=880,d=.12){if(!S.sound)return;try{actx=actx||new (window.AudioCo
 async function lock(on){try{if(on&&'wakeLock'in navigator)wake=await navigator.wakeLock.request('screen');else if(wake){await wake.release();wake=null}}catch(e){}}
 function startWorkout(k=curKey()){history.pushState({ov:1},'');checkGap();try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}P={k,rest:k==='P'?10:k==='K'?5:cfg(S.pw).rest,items:routine(k),i:0,set:1,phase:'',t0:Date.now(),end:0,left:0,paused:false,lastSec:-1};
   $('#player').classList.add('on');lock(true);enter(EX[P.items[0][0]].timed?'ready':'work');clearInterval(tick);tick=setInterval(onTick,200)}
-function enter(ph,secs){P.lockUntil=Date.now()+350;P.phase=ph;P.paused=false;P.lastSec=-1;const it=P.items[P.i];
+function enter(ph,secs){P.lockUntil=Date.now()+350;P.phase=ph;P.paused=false;P.lastSec=-1;const it=P.items[P.i];if(ph==='work'&&!EX[it[0]].timed)P.cur=it[2];
   if(ph==='ready')secs=5; if(ph==='work'&&EX[it[0]].timed)secs=it[2];
   P.timed=secs!=null; if(P.timed)P.end=Date.now()+secs*1000; renderPlayer()}
 function hasNext(){const it=P.items[P.i];return P.set<it[1]||P.i<P.items.length-1}
@@ -848,9 +848,16 @@ function finish(){clearInterval(tick);lock(false);P.dur=Math.max(1,Math.round((D
     $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr;grid-template-columns:1fr"><div style="align-self:center;max-width:520px;width:100%;margin:0 auto"><div class="pinfo"><div class="ph">Última pregunta</div><h1 style="margin:8px 0 8px">¿Cómo fue el cardio?</h1><p class="mut" style="margin-bottom:22px">Con tu respuesta ajusto el próximo.</p></div>
     <div class="opt">${[['F','Fácil','Podría haber seguido mucho más'],['B','Bien','Cansado, pero podía hablar'],['D','Muy duro','Me faltó el aire o tuve que parar']].map(([v,t,d])=>`<button data-act="krate" data-v="${v}" style="padding:18px"><b style="font-size:19px">${t}</b><span>${d}</span></button>`).join('')}</div></div></div>`;return}
   if(P.k==='P'){S.breaks=S.breaks.filter(d=>d===dkey()).concat(dkey());save();return renderDone()}
+  P.adj=repAdjust();
   S.sessions.push({d:dkey(),r:P.k,lvl:lv(),pw:S.pw,dur:P.dur,sets:P.sets,rate:null,ld:P.items.map(x=>x[0]).filter(id=>LOADED[id]&&!(P.skipped||[]).includes(id))});S.cycle=(CYCLE.indexOf(P.k)+1)%CYCLE.length;S.pick=null;S.note='';save();P.sub='rate';
   $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr;grid-template-columns:1fr"><div style="align-self:center;max-width:520px;width:100%;margin:0 auto"><div class="pinfo"><div class="ph">Última pregunta</div><h1 style="margin:8px 0 8px">¿Cómo estuvo?</h1><p class="mut" style="margin-bottom:22px">Con tu respuesta ajusto la próxima sesión.</p></div>
     <div class="opt">${[['F','Fácil','Me sobraron fuerzas en todas las series'],['B','Bien','Exigente, pero la terminé entera'],['D','Muy duro','No pude completar las series']].map(([v,t,d])=>`<button data-act="rate" data-v="${v}" style="padding:18px"><b style="font-size:19px">${t}</b><span>${d}</span></button>`).join('')}</div></div></div>`}
+function repAdjust(){const out=[];S.xb=S.xb||{};S.lc=S.lc||{};
+  P.items.forEach((it,i)=>{const id=it[0];if(EX[id].timed||isWarm(it,i)||!P.got||P.got[i]==null||(P.skipped||[]).includes(id))return;const d=P.got[i]-it[2];
+    if(d>=2){if(LOADED[id]&&raiseLoad(id)){S.lc[id]=0;out.push(`${EX[id].name.toLowerCase()}: ${loadTxt(id).replace(/^./,c=>c.toLowerCase())}`);return}
+      const add=Math.min(4,d,capOf(id)-it[2]);if(add>0){S.xb[id]=(S.xb[id]||0)+add;out.push(`${EX[id].name.toLowerCase()}: +${add} rep`)}}
+    else if(d<=-3)S.xb[id]=Math.max(-4,(S.xb[id]||0)-2)});
+  return out}
 function kRate(v){const a=S.kAdj||0;
   if(v==='F'){S.kAdj=Math.min(5,a+5);P.kmsg=a>=5?'Ya vas 5 minutos por encima del plan. La intensidad sigue subiendo sola con las semanas.':'Te subo 5 minutos el próximo cardio.'}
   else if(v==='D'){S.kAdj=Math.max(-5,a-5);P.kmsg='El próximo cardio será 5 minutos más corto. Ve a un ritmo en el que puedas hablar: no hace falta ahogarse para quemar grasa.'}
@@ -870,7 +877,7 @@ function renderDone(){const brk=P.k==='P',cd=P.k==='K',w=weekInfo();
   $('#player').innerHTML=`<div class="wrap" style="grid-template-rows:1fr auto;grid-template-columns:1fr"><div class="done-hero" style="align-self:center"><div class="ring"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
     <div class="pinfo"><div class="ph">${brk?'Pausa hecha':cd?'Cardio hecho':'Entreno completado'}</div></div><h1 style="margin:8px 0 22px">${RT[P.k].name}</h1>
     <div class="stats" style="max-width:420px;margin:0 auto"><div class="card stat"><b class="num">${P.dur}</b><span>minutos</span></div><div class="card stat"><b class="num">${P.sets}</b><span>${cd?'bloques':'series'}</span></div><div class="card stat"><b class="num">${brk?breaksToday():w.count+'/'+goalN()}</b><span>${brk?'pausas hoy':'esta semana'}</span></div></div>
-    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`${P.kmsg?`<b style="color:var(--tx)">${P.kmsg}</b><br><br>`:''}Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, solo pausas activas.`}</p></div>
+    <p class="mut" style="margin:22px auto 0;max-width:30em">${brk?'Vuelve al trabajo con la espalda recta y repítela en un par de horas.':cd?`${P.kmsg?`<b style="color:var(--tx)">${P.kmsg}</b><br><br>`:''}Esto cuenta como tu caminata de hoy. Próxima sesión de fuerza ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>.`:(P.adj&&P.adj.length?`<b style="color:var(--ac)">Te subo: ${P.adj.join('; ')}.</b><br><br>`:'')+(S.note?`<b style="color:var(--tx)">${S.note}</b><br><br>`:'')+`Próxima sesión ${nextDay()}: <b style="color:var(--tx)">${RT[curKey()].name}</b>. Los días libres, solo pausas activas.`}</p></div>
     <button class="btn pri xl" data-act="closePlayer">Listo</button></div>`}
 function renderPlayer(){
   const it=P.items[P.i],e=EX[it[0]],total=P.items.reduce((t,i)=>t+i[1],0),done=P.items.slice(0,P.i).reduce((t,i)=>t+i[1],0)+P.set-1;
@@ -883,7 +890,7 @@ function renderPlayer(){
   let act;
   if(rest)act=`<div class="two"><button class="btn xl" data-act="plus">+15 s</button><button class="btn pri xl" data-act="skipRest">Seguir</button></div><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica del siguiente</button>`;
   else if(e.timed)act=`<div class="two"><button class="btn xl" data-act="pause" id="pauseBtn">Pausa</button><button class="btn xl" data-act="doneSet">Saltar</button></div><div class="two"><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica</button><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar</button></div>`;
-  else act=`<button class="btn pri xl" data-act="doneSet">Serie hecha</button><div class="two"><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica</button><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar</button></div>`;
+  else act=`<div class="two" style="grid-template-columns:64px 1fr 64px;align-items:center"><button class="btn xl" data-act="rep" data-v="-1" aria-label="Una menos">−</button><div style="text-align:center"><b class="num" id="gotN" style="font-size:30px">${P.cur}</b><div class="small mut">hice</div></div><button class="btn xl" data-act="rep" data-v="1" aria-label="Una más">+</button></div><button class="btn pri xl" data-act="doneSet">Serie hecha</button><div class="two"><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica</button><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar</button></div>`;
   $('#player').innerHTML=`<div class="wrap"><div class="ptop"><button class="xbtn" data-act="quit" aria-label="Salir del entreno">✕</button><div class="pbar">${bar}</div><span class="small mut num">${P.i+1}/${P.items.length}</span></div>
     <div class="pmid">${stage(it[0],true)}${info}</div>
     <div class="side">${info}<div class="pact">${act}</div></div></div>`;
@@ -921,7 +928,8 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
     case 'ob':OB[b.dataset.k]=cast(v);{const kg=$('#obKg').value;renderOb();$('#obKg').value=kg}break;
     case 'obGo':{const kg=parseFloat($('#obKg').value);S.pw=1;S.note='Empezamos de cero y a propósito suave. Hoy no se trata de sufrir: se trata de volver la próxima vez. Hazte hoy una foto y mídete la cintura: las compararás en la semana 12.';S.days=OB.days;S.when=OB.when;S.plan=null;S.since=dkey();S.setup=true;if(kg>=30&&kg<=250)S.weights.push({d:dkey(),kg:Math.round(kg*10)/10});save();$('#onboard').classList.remove('on');render()}break;
     case 'start':startWorkout();break;
-    case 'doneSet':finishSet();break;
+    case 'doneSet':if(P.phase==='work'&&!EX[P.items[P.i][0]].timed)(P.got=P.got||{})[P.i]=P.cur;finishSet();break;
+    case 'rep':P.cur=Math.max(0,Math.min(60,P.cur+(+v)));document.querySelectorAll('#gotN').forEach(e=>e.textContent=P.cur);break;
     case 'skipEx':(P.skipped=P.skipped||[]).push(P.items[P.i][0]);P.set=P.items[P.i][1];finishSet();break;
     case 'skipRest':afterRest();break;
     case 'plus':P.end+=15000;onTick();break;
