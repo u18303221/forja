@@ -788,12 +788,12 @@ function openEx(id){const e=EX[id];if(!$('#sheet').classList.contains('on'))hist
   $('#sheet').innerHTML=`<div class="sheet-in"><div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="xbtn" data-act="closeSheet" aria-label="Cerrar">✕</button></div>
   ${stage(id,true)}
   <div style="margin:20px 0 6px"><span class="chip ac">${GROUPS.find(g=>g[0]===e.g)[1]}</span></div>
-  <h1 style="font-size:32px">${e.name}</h1><p class="mut" style="margin-top:6px">Trabaja: ${e.m} <span style="color:var(--ac)">●</span> zona marcada en naranja</p>
-  ${(()=>{const n=note(id);return n!==e.tip&&id!=='fondos'&&id!=='plancha'&&id!=='elev_piernas'?`<div class="sec card note"><p><b>Por ahora:</b> ${n}</p></div>`:''})()}
-  ${LOADED[id]?`<div class="sec card note"><p><b>Tu carga ahora: ${loadTxt(id)}.</b> ${loadHow(id)}</p><p class="small mut" style="margin-top:8px">La subo yo cuando las sesiones con este ejercicio te salen bien: «Fácil» una vez y «Bien» otra, o «Bien» tres veces. Si marcas «Muy duro», espero.</p></div>`:''}
+  <h1 style="font-size:32px">${e.name}</h1><p class="mut" style="margin-top:6px">${e.m} <span style="color:var(--ac)">●</span></p>
+  ${(()=>{const n=note(id);return n!==e.tip&&id!=='fondos'&&id!=='plancha'&&id!=='elev_piernas'?`<div class="sec card note"><p><b>Ahora:</b> ${n}</p></div>`:''})()}
+  ${LOADED[id]?`<div class="sec card note"><p><b>Carga: ${loadTxt(id)}</b>${LOADED[id][0]==='m'?` · ${fk(loadOf(id))} botellas de 1 L`:''}</p><p class="small mut" style="margin-top:6px">La subo yo cuando te sale bien.</p></div>`:''}
   <div class="sec"><h3>Cómo se hace</h3><ol class="steps">${e.steps.map(s=>`<li><span>${s}</span></li>`).join('')}</ol></div>
   <div class="sec tipbox"><div class="good"><b>Clave</b>${e.tip}</div><div class="bad"><b>Error típico</b>${e.bad}</div></div>
-  ${SUB[id]?`<div class="sec"><button class="btn sm ${S.swap[id]?'pri':''}" data-act="swap" data-v="${id}" style="width:100%">${S.swap[id]?`Sustituido por ${EX[subOf(id)].name.toLowerCase()} · Deshacer`:'Me molesta este ejercicio'}</button><p class="small mut" style="margin-top:8px">Si te duele una articulación (no es lo mismo que cansancio), lo cambio por ${EX[SUB[id][0]].name.toLowerCase()} en todas tus rutinas.${P&&P.phase!=='done'?' El cambio vale desde la próxima sesión; en esta, sáltalo.':''}</p></div>`:''}</div>`;
+  ${SUB[id]?`<div class="sec"><button class="btn sm ${S.swap[id]?'pri':''}" data-act="swap" data-v="${id}" style="width:100%">${S.swap[id]?`Sustituido por ${EX[subOf(id)].name.toLowerCase()} · Deshacer`:'Me molesta este ejercicio'}</button><p class="small mut" style="margin-top:8px">Si duele la articulación: lo cambio por ${EX[SUB[id][0]].name.toLowerCase()}.${P&&P.phase!=='done'?' Hoy, sáltalo.':''}</p></div>`:''}</div>`;
   $('#sheet').classList.add('on');$('#sheet').scrollTop=0;mountAnims()}
 
 /* ---------- onboarding ---------- */
@@ -825,7 +825,7 @@ function advance(){const it=P.items[P.i];if(P.set<it[1])P.set++;else{P.i++;P.set
 function finishSet(){beep(1175,.2);if(!hasNext())return finish();advance();enter('rest',P.rest)}
 function afterRest(){beep(660,.18);enter(EX[P.items[P.i][0]].timed?'ready':'work')}
 function onTick(){if(!P||!P.timed||P.paused||P.phase==='done')return;
-  if($('#modal').classList.contains('on')){if(!P.fz)P.fz=Date.now();return}if(P.fz){P.end+=Date.now()-P.fz;P.fz=0}
+  if($('#modal').classList.contains('on')||$('#sheet').classList.contains('on')){if(!P.fz)P.fz=Date.now();return}if(P.fz){P.end+=Date.now()-P.fz;P.fz=0}
   const left=(P.end-Date.now())/1000,sec=Math.ceil(left);
   document.querySelectorAll('.ptime').forEach(el=>el.textContent=P.phase==='ready'?Math.max(1,sec):fmt(left));
   if(sec!==P.lastSec){P.lastSec=sec;if(sec<=3&&sec>0)beep(P.phase==='rest'?520:740,.07)}
@@ -868,8 +868,8 @@ function renderPlayer(){
   const info=`<div class="pinfo ${rest?'rest':''}"><div class="ph">${label}</div><h2>${rest?'Siguiente: ':''}${e.name}</h2>${big}
     <p class="mut">${LOADED[it[0]]?`<b style="color:var(--ac)">${loadTxt(it[0])}</b> · `:''}${rest?`Serie ${P.set} de ${it[1]} · ${qty(it)}`:note(it[0])}</p></div>`;
   let act;
-  if(rest)act=`<div class="two"><button class="btn xl" data-act="plus">+15 s</button><button class="btn pri xl" data-act="skipRest">Seguir</button></div>`;
-  else if(e.timed)act=`<div class="two"><button class="btn xl" data-act="pause" id="pauseBtn">Pausa</button><button class="btn xl" data-act="doneSet">Saltar</button></div><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar ejercicio</button>`;
+  if(rest)act=`<div class="two"><button class="btn xl" data-act="plus">+15 s</button><button class="btn pri xl" data-act="skipRest">Seguir</button></div><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica del siguiente</button>`;
+  else if(e.timed)act=`<div class="two"><button class="btn xl" data-act="pause" id="pauseBtn">Pausa</button><button class="btn xl" data-act="doneSet">Saltar</button></div><div class="two"><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica</button><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar</button></div>`;
   else act=`<button class="btn pri xl" data-act="doneSet">Serie hecha</button><div class="two"><button class="btn ghost sm" data-act="ex" data-v="${it[0]}" style="color:var(--mut)">Ver técnica</button><button class="btn ghost sm" data-act="skipEx" style="color:var(--mut)">Me duele · saltar</button></div>`;
   $('#player').innerHTML=`<div class="wrap"><div class="ptop"><button class="xbtn" data-act="quit" aria-label="Salir del entreno">✕</button><div class="pbar">${bar}</div><span class="small mut num">${P.i+1}/${P.items.length}</span></div>
     <div class="pmid">${stage(it[0],true)}${info}</div>
