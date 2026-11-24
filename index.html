@@ -285,6 +285,7 @@ function fig(ex,u){
   s+=ln(hip,kN,15,C.bg)+ln(kN,fn,12.5,C.bg);
   s+=limb(fn,toeP,7.5,6,C.near)+limb(kN,fn,9,6.8,has('calves')?C.hl:C.near)+limb(hip,kN,11.5,9,has('thighs')?C.hl:C.near);
   if(has('glutes')) s+=ci(hip,9,C.hl)+G(hip,9);
+  if(pr.wheel){s+=`<circle cx="${f1(hn[0])}" cy="${FLOOR-8}" r="8" fill="${C.propHi}" stroke="${C.bg}" stroke-width="2"/><circle cx="${f1(hn[0])}" cy="${FLOOR-8}" r="2.5" fill="${C.prop}"/>`}
   // brazo cercano
   if(pr.pack!=null && pr.pack>0) s+=pack(hn);
   s+=ln(sho,eN,13.5,C.bg)+ln(eN,hn,11.5,C.bg);
@@ -427,6 +428,10 @@ plancha_toque:{name:'Plancha con toque de hombro',g:'core',m:'Abdomen · oblicuo
   a:{...pv([36,130],-22.6),hN:[140,135],hF:[140,135],fN:[36,130],toeN:80,hd:-14},b:{...pv([36,130],-22.6),hNp:[150,13],hF:[140,135],fN:[36,130],toeN:80,hd:-14},
   steps:['Posición de flexión con los pies separados.','Toca un hombro con la mano contraria sin girar la cadera.','Apoya y cambia de mano.'],
   tip:'Cuanto más separes los pies, más fácil mantener la cadera quieta.',bad:'Balancear la cadera de lado a lado.'},
+rueda:{name:'Rueda abdominal',g:'core',m:'Abdomen completo · core profundo',hl:['abs','shoulders'],props:{wheel:1},kb:1,
+  a:{hip:[82,114],t:-42,hN:[122,131],fN:[26,134],toeN:180,hd:-12},b:{hip:[89,127],t:-12,hN:[180,131],fN:[26,134],toeN:180,hd:-6},
+  steps:['De rodillas sobre una toalla, manos en la rueda justo debajo de los hombros.','Aprieta abdomen y glúteos y rueda hacia delante despacio, solo hasta donde aguantes sin que se hunda la zona lumbar.','Vuelve tirando con el abdomen, no con los brazos.'],
+  tip:'Rueda hacia una pared: que te frene a medio camino. Cada semana, aléjate un poco.',bad:'Dejar caer la cadera y arquear la espalda: carga la zona lumbar.'},
 escalador:{name:'Escalador',g:'cardio',m:'Core · hombros · cardio',hl:['abs','thighs'],timed:1,seq:1,period:1.3,
   a:{hip:[94,100],t:-15.6,hN:[140,135],fN:[38,129],fF:[100,128],toeN:80,hd:-14},b:{hip:[94,100],t:-15.6,hN:[140,135],fN:[100,128],fF:[38,129],toeN:80,hd:-14},
   steps:['Posición de flexión, brazos estirados.','Lleva una rodilla al pecho y cambia de pierna.','Mantén el ritmo sin levantar la cadera.'],
@@ -452,8 +457,8 @@ A:{name:'Pecho y brazos',focus:'Empuje',desc:'Pecho firme, hombros y tríceps.',
  3:[['trote',1,60],['flex',3,8],['flex_decl',2,6],['press_suelo',3,14,2],['pike',3,8,3],['fondos',3,10],['flex_diam',2,6,4],['patada',3,12]]}},
 B:{name:'Piernas y core',focus:'Tren inferior',desc:'El día que más calorías gasta.',lv:{
  1:[['marcha',1,40],['sentadilla',3,10],['puente',3,12],['talones',2,15,2],['crunch',3,10],['birddog',2,6,3],['deadbug',2,6,4]],
- 2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30,2],['elev_piernas',2,10,3],['deadbug',2,8,4],['escalador',3,20]],
- 3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['peso_muerto',2,12,4],['wallsit',3,45,2],['puente',2,15],['elev_piernas',2,12,3],['escalador',3,30]]}},
+ 2:[['marcha',1,60],['sentadilla',3,15],['zancada',3,8],['puente',3,15],['wallsit',2,30,2],['rueda',2,6,3],['deadbug',2,8,4],['escalador',3,20]],
+ 3:[['marcha',1,60],['sentadilla',3,20],['zancada',3,12],['peso_muerto',2,12,4],['wallsit',3,45,2],['puente',2,15],['rueda',3,8,2],['escalador',3,30]]}},
 C:{name:'Espalda y postura',focus:'Tirón',desc:'Abre los hombros y endereza la espalda.',lv:{
  1:[['marcha',1,40],['remo',3,10],['superman',3,8],['flex_pared',2,12],['birddog',2,6,2],['curl',2,10,3],['angel',2,10,4]],
  2:[['marcha',1,60],['remo',4,12],['peso_muerto',3,10,4],['superman',3,10],['flex_incl',3,10],['curl',3,12,2],['angel',2,12,3],['plancha',3,30]],
@@ -496,7 +501,7 @@ const need=()=>tDays();
 const cplan=()=>CPLAN[phaseKey()===3&&S.pw>=3?33:phaseKey()];
 const kOpt=()=>S.pw<=2;
 const isWarm=(it,i)=>i===0&&it[1]===1;
-const capOf=id=>['fondos','flex_decl','pike','flex_diam'].includes(id)?10:['flex_pared','flex_incl','flex_rod','flex'].includes(id)?15:['superman','elev_piernas'].includes(id)?12:EX[id].side?12:EX[id].timed?60:['sentadilla','puente','talones'].includes(id)?20:16;
+const capOf=id=>['fondos','flex_decl','pike','flex_diam'].includes(id)?10:['flex_pared','flex_incl','flex_rod','flex'].includes(id)?15:['superman','elev_piernas','rueda'].includes(id)?12:EX[id].side?12:EX[id].timed?60:['sentadilla','puente','talones'].includes(id)?20:16;
 function modifier(week,items,i,bonus=0,ease=false){
   const [id,st,v]=items[i],c=cfg(week),t=EX[id].timed;
   if(isWarm(items[i],i))return [id,1,v];
@@ -506,7 +511,7 @@ function modifier(week,items,i,bonus=0,ease=false){
   let val=t?Math.round(v*p/500)*5+5*bonus:Math.round(v*p/100)+bonus;
   return [id,sets,Math.min(capOf(id),Math.max(t?10:4,val))];
 }
-const SUB={plancha_toque:['plancha',30],bicicleta:['crunch',10],crunch_inv:['crunch',10],flex_diam:['flex',8],peso_muerto:['puente',15],fondos:['press',12],pike:['press',12],flex_decl:['flex_incl',10],flex:['flex_rod',8],flex_rod:['flex_incl',10],zancada:['puente',15],wallsit:['puente',15],elev_piernas:['crunch',10],superman:['birddog',6],escalador:['marcha',40]};
+const SUB={rueda:['plancha',30],plancha_toque:['plancha',30],bicicleta:['crunch',10],crunch_inv:['crunch',10],flex_diam:['flex',8],peso_muerto:['puente',15],fondos:['press',12],pike:['press',12],flex_decl:['flex_incl',10],flex:['flex_rod',8],flex_rod:['flex_incl',10],zancada:['puente',15],wallsit:['puente',15],elev_piernas:['crunch',10],superman:['birddog',6],escalador:['marcha',40]};
 const subOf=id=>{while(S.swap[id]&&SUB[id])id=SUB[id][0];return id};
 /* carga: mochila en kg (1 L de agua = 1 kg) y botellas en litros */
 const LOADED={press:['m',4],press_suelo:['m',6],remo:['m',6],peso_muerto:['m',8],curl:['b',1.5],elev_front:['b',1],patada:['b',1]};
@@ -552,6 +557,7 @@ function schedule(){const w=weekInfo(),ti=todayIdx(),by={},cp=cplan(),cd=new Set
 function note(id){const w=S.pw;
   if(id==='jacks'&&w<=8)return 'Estas semanas, sin salto: abre una pierna al lado y luego la otra mientras subes los brazos.';
   if(id==='trote'&&w<=8)return 'Estas semanas, sin saltar: marcha rápida llevando el talón atrás.';
+  if(id==='rueda')return w<=8?'Recorrido corto: pon la rueda a un palmo y medio de una pared para que te frene. De rodillas siempre.':'Ya puedes alejarte de la pared, siempre sin hundir la espalda. Si la zona lumbar molesta, vuelve a acercarte.';
   if(id==='fondos')return 'Rodillas dobladas y pies cerca. Baja poco: codo a 90° como máximo. Si molesta delante del hombro, sáltalo y en «Ver técnica» toca «Me molesta este ejercicio».';
   if(id==='flex_incl'&&w<=2)return 'Estas dos semanas, manos en una mesa o encimera. Pasa a la silla cuando salgan todas las series.';
   if(id==='sentadilla'&&w<=2)return 'Estas dos semanas, siéntate y levántate de una silla.';
@@ -793,7 +799,7 @@ function openEx(id){const e=EX[id];if(!$('#sheet').classList.contains('on'))hist
 /* ---------- onboarding ---------- */
 let OB={level:1,days:3,when:'am'};
 function renderOb(){$('#onboard').innerHTML=`<div class="ob"><div class="logo">FORJA</div><h1>Entrena en casa.<br>Sin máquinas.</h1>
-  <p class="mut">Solo necesitas una silla firme, una pared, una mesa, una mochila con libros y dos botellas de agua. Entre 15 y 30 minutos por sesión.</p>
+  <p class="mut">Solo necesitas una silla firme, una pared, una mesa, una mochila con libros, dos botellas de agua y, si la tienes, una rueda abdominal. Entre 15 y 30 minutos por sesión.</p>
   ${navigator.standalone?'':'<p class="small mut" style="margin-top:10px">¿En iPhone? Primero toca <b>Compartir</b> y «Agregar a Inicio», y abre Forja desde su icono: lo que configures aquí en Safari no pasa a la app.</p>'}
   <div class="sec"><h3>Tus días</h3><div class="card note"><p>Los pongo yo. Empiezas con <b>3 días de fuerza: lunes, miércoles y sábado</b>, y un cardio suave el martes, opcional las dos primeras semanas. Los demás días, solo pausas activas, y el domingo descanso total. Voy sumando días e intensidad según avances. Tú solo eliges la hora.</p></div></div>
   <div class="sec"><h3>¿A qué hora?</h3><div class="opt">${[['am','Por la mañana · recomendado','Si trabajas de 8:30 hasta la noche: a las 6:45, antes de salir'],['pm','Por la noche','Al llegar a casa, antes de cenar']].map(([v,t,d])=>`<button class="${OB.when===v?'on':''}" data-act="ob" data-k="when" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>
