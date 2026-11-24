@@ -576,10 +576,13 @@ function closeWeek(o,pass){
   else{let next=from+1,easy=F===n;const b0=S.bonus;if(easy)S.bonus=Math.min(2,S.bonus+1);
     if(gateDue()){S.hold=!pass;if(pass){next=9;m='Fase Forja. Ahora haces flexiones clásicas, las que hace semanas no salían. Esta semana va suave. Tus días cambian: fuerza lunes, martes, jueves y sábado, y cardio el miércoles.'}
       else m='Seguimos en Base con un poco más cada semana. No es ir atrás: es llegar fuerte a la flexión clásica. Te lo vuelvo a preguntar la semana que viene.'}
+    let jump=false;if(easy&&!gateDue()&&next===from+1&&from!==4){const cap=from<8?8:12;if(from+2<=cap){next=from+2;jump=true;S.bonus=b0}}
     if(next>12){next=9;m=S.hold?'Vuelta completa en Base+. Empezamos otra vuelta un poco más suave y te vuelvo a preguntar por las flexiones la semana que viene.':`Ciclo completado: ${S.sessions.length} sesiones. Hazte una foto y mídete la cintura para comparar. Empieza otra vuelta, con una semana suave.`}
     S.pw=next;S.rep=0;if(cfg(S.pw).ds==='all')S.bonus=0;
+    if(jump)m=`Toda la semana te resultó fácil: me salto una. Pasas a la semana ${next}.${next===5?' Ahora son 4 días de fuerza (se suma el viernes).':''}`;
     if(!m)m=from===1?'Primera semana hecha. Lo difícil no eran las flexiones, era empezar. Ya empezaste.':next===5?'Fase Base desbloqueada. Ejercicios nuevos y menos series esta semana: aprende el movimiento. Y pasamos a 4 días de fuerza: se suma el viernes, con un cardio el martes.':`Semana ${from} superada. Pasas a la semana ${next}: ${focus()}.`;
-    if(next===from+1){const ad=adds(S.pw);if(ad.length)m+=` Esta semana ${ad.length>1?'se suman':'se suma'}: ${ad.join(', ')}.`}
+    if(next===from+1||jump){const u=x=>new Set(CYCLE.flatMap(k=>routine(k,x).map(i=>i[0]))),a=u(from),ad=[...u(S.pw)].filter(id=>!a.has(id)).map(id=>EX[id].name.toLowerCase());
+      if(ad.length)m+=` Nuevos: ${ad.slice(0,3).join(', ')}${ad.length>3?` y ${ad.length-3} más`:''}.`}
     if(easy&&S.bonus>b0&&cfg(S.pw).ds!=='all')m+=' Como todo te resultó fácil, te subo un poco: una repetición más (o 5 segundos) donde aún hay margen.'}
   S.ws=[];S.note=m}
 function checkGap(){const l=S.sessions[S.sessions.length-1];if(!l||S.gapFor===l.d)return;
@@ -589,7 +592,7 @@ function checkGap(){const l=S.sessions[S.sessions.length-1];if(!l||S.gapFor===l.
   S.note=`Llevabas ${g} días sin entrenar. ${S.pw<from?`Bajamos a la semana ${S.pw}`:`Retomamos en la semana ${S.pw}`} para volver sin lesiones. Se recupera rápido.`;save()}
 
 const KEY='forja.v1';
-const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[],load:{},lc:{},kAdj:0};
+const DEF={setup:false,pw:1,ws:[],rep:0,bonus:0,hold:false,ease:false,gapFor:null,swap:{},note:'',days:3,plan:null,when:'am',sound:true,cycle:0,pick:null,sessions:[],weights:[],breaks:[],cardio:[],load:{},lc:{},kAdj:0,waist:[]};
 const fresh=()=>JSON.parse(JSON.stringify(DEF));
 let S=load();
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}')||{},t={...fresh(),...o};if(o.setup&&o.pw==null&&o.level)t.pw={1:1,2:5,3:9}[o.level]||1;delete t.level;delete t.rest;return t}catch(e){return fresh()}}
@@ -748,13 +751,23 @@ function chart(){
 function vProg(){
   const n=S.sessions.length,min=S.sessions.reduce((t,s)=>t+s.dur,0),last=S.weights[S.weights.length-1],first=S.weights[0];
   const diff=last&&first&&S.weights.length>1?(last.kg-first.kg):null;
+  const W=S.waist||[],wl=W[W.length-1],wd=W.length>1?wl.cm-W[0].cm:null;
+  const ups=Object.keys(LOADED).filter(id=>loadOf(id)>LOADED[id][1]).map(id=>`${EX[id].name.replace(/ con (mochila|botellas?)$/,'')}: ${fk(LOADED[id][1])} → ${fk(loadOf(id))} ${LOADED[id][0]==='m'?'kg':'L'}`);
+  const sg=(v,u)=>`<b class="num" style="color:${v<=0?'var(--ac)':'var(--tx)'}">${v>0?'+':''}${fk(Math.round(v*10)/10)} ${u}</b>`;
+  const res=[diff!==null?['Peso',sg(diff,'kg')]:null,wd!==null?['Cintura',sg(wd,'cm')]:null,['Plan',`<b>Semana ${S.pw} de 12</b>`],...ups.map(u=>['Más fuerza',`<b>${u}</b>`])].filter(Boolean);
   return `<div class="head"><div><div class="eyebrow">Constancia antes que intensidad</div><h1>Progreso</h1></div></div>
+  <div class="sec" style="margin-top:0"><h3>Tus resultados</h3><div class="card">${res.map(([a,b])=>`<div class="hist"><span class="mut">${a}</span><span>${b}</span></div>`).join('')}
+    ${diff===null||wd===null?'<p class="small mut" style="margin-top:10px">Anota peso y cintura una vez por semana: la cintura baja antes que el peso.</p>':''}</div></div>
   <div class="stats"><div class="card stat"><b class="num">${n}</b><span>sesiones</span></div><div class="card stat"><b class="num">${min}</b><span>minutos</span></div><div class="card stat"><b class="num">${streakWeeks()}</b><span>semanas seguidas</span></div></div>
   <div class="two-col"><div>
   <div class="sec"><h3>Peso</h3><div class="card">
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px"><div><b class="num" style="font-size:38px;font-weight:800;letter-spacing:-.03em">${last?last.kg:'—'}</b> <span class="mut">kg</span></div>${diff!==null?`<span class="chip ${diff<=0?'ac':''} num">${diff>0?'+':''}${diff.toFixed(1)} kg desde el inicio</span>`:''}</div>
     <form class="field" data-form="peso"><input name="kg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="Peso de hoy (kg)" aria-label="Peso de hoy en kilos"><button class="btn pri sm" style="min-height:52px">Guardar</button></form>
     ${chart()}</div></div>
+  <div class="sec"><h3>Cintura</h3><div class="card">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px"><div><b class="num" style="font-size:38px;font-weight:800;letter-spacing:-.03em">${wl?fk(wl.cm):'—'}</b> <span class="mut">cm</span></div>${wd!==null?`<span class="chip ${wd<=0?'ac':''} num">${wd>0?'+':''}${fk(wd)} cm desde el inicio</span>`:''}</div>
+    <form class="field" data-form="cintura"><input name="cm" type="number" inputmode="decimal" step="0.5" min="50" max="200" placeholder="Cintura de hoy (cm)" aria-label="Cintura de hoy en centímetros"><button class="btn pri sm" style="min-height:52px">Guardar</button></form>
+    <p class="small mut" style="margin-top:10px">Cinta a la altura del ombligo, en ayunas, sin apretar.</p></div></div>
   </div><div>
   <div class="sec"><h3>Historial</h3><div class="card">${n?S.sessions.slice(-12).reverse().map(s=>`<div class="hist"><span><b>${RT[s.r].name}</b> <span class="mut">· ${s.pw?'semana '+s.pw:LEVELS[s.lvl][0]}</span></span><span class="mut num">${s.d.split('-').reverse().slice(0,2).join('/')} · ${s.dur} min</span></div>`).join(''):'<p class="mut">Aún no hay sesiones. La primera es la que más cuesta: son unos 15 minutos.</p>'}</div></div>
   </div></div>`;
@@ -923,7 +936,9 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');i
     case 'mNo':$('#modal').classList.remove('on');break;
     case 'mYes':$('#modal').classList.remove('on');modalYes&&modalYes();break;
   }});
-document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;if(f.dataset.form==='peso'){const kg=parseFloat(f.kg.value);if(!(kg>=30&&kg<=250))return;
+document.addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target;
+  if(f.dataset.form==='cintura'){const cm=parseFloat(f.cm.value);if(!(cm>=50&&cm<=200))return;const W=S.waist=S.waist||[],r={d:dkey(),cm:Math.round(cm*2)/2},i=W.findIndex(w=>w.d===r.d);if(i>=0)W[i]=r;else W.push(r);save();render();return}
+  if(f.dataset.form==='peso'){const kg=parseFloat(f.kg.value);if(!(kg>=30&&kg<=250))return;
   const r={d:dkey(),kg:Math.round(kg*10)/10},i=S.weights.findIndex(w=>w.d===r.d);if(i>=0)S.weights[i]=r;else S.weights.push(r);save();render()}});
 
 addEventListener('popstate',()=>{if($('#modal').classList.contains('on'))$('#modal').classList.remove('on');
